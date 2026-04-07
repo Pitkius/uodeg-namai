@@ -30,7 +30,12 @@ authRouter.post(
 
     const passwordHash = await bcrypt.hash(password, 12);
     const user = await User.create({ name, email: email.toLowerCase(), passwordHash });
-    await sendWelcomeEmail(user.email, user.name);
+    try {
+      await sendWelcomeEmail(user.email, user.name);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error("Welcome email failed:", e?.message || e);
+    }
 
     const token = signAccessToken(user);
     res.json({
@@ -132,7 +137,12 @@ authRouter.post(
     user.resetCodeHash = "";
     user.resetCodeExpiresAt = null;
     await user.save();
-    await sendPasswordChangedEmail(user.email, user.name);
+    try {
+      await sendPasswordChangedEmail(user.email, user.name);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error("Password changed email failed:", e?.message || e);
+    }
 
     return res.json({ ok: true });
   })
