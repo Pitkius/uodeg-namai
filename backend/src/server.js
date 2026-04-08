@@ -77,7 +77,7 @@ async function bootstrap() {
 
   app.listen(env.port, () => {
     // eslint-disable-next-line no-console
-    console.log(`API running on http://localhost:${env.port}`);
+    console.log(`API listening on port ${env.port} (public URL is your Hostinger/domain endpoint, not localhost)`);
   });
 }
 
