@@ -43,7 +43,11 @@ export async function sendWelcomeEmail(toEmail, name) {
   const safeName = name || "vartotojau";
   if (!tx) {
     // eslint-disable-next-line no-console
-    console.log(`[welcome-email] ${toEmail}: account created for ${safeName}`);
+    console.warn(
+      "[mail] Welcome email NOT sent: SMTP not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM on the server."
+    );
+    // eslint-disable-next-line no-console
+    console.log(`[welcome-email] ${toEmail}: account created for ${safeName} (console only)`);
     return;
   }
 
