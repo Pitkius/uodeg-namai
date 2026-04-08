@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs/promises";
 import multer from "multer";
+import sharp from "sharp";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { requireAuth } from "../middleware/auth.js";
 import { env } from "../config/env.js";
@@ -38,12 +39,51 @@ const upload = multer({
   }
 });
 
+/** Resize + JPEG compress so uploads stay small; on failure keeps original file. */
+async function optimizePhotoFile(inputPath) {
+  const ext = path.extname(inputPath).toLowerCase();
+  const dir = path.dirname(inputPath);
+  const base = path.basename(inputPath, ext);
+  const finalFilename = `${base}.jpg`;
+  const finalPath = path.join(dir, finalFilename);
+  const tmpPath = path.join(dir, `.opt-${Date.now()}.jpg`);
+
+  await sharp(inputPath)
+    .rotate()
+    .resize({
+      width: 1920,
+      height: 1920,
+      fit: "inside",
+      withoutEnlargement: true
+    })
+    .jpeg({ quality: 82, mozjpeg: true })
+    .toFile(tmpPath);
+
+  if (inputPath !== finalPath) {
+    await fs.unlink(inputPath).catch(() => {});
+  } else {
+    await fs.unlink(inputPath);
+  }
+  await fs.rename(tmpPath, finalPath);
+
+  return { path: finalPath, filename: finalFilename };
+}
+
 uploadsRouter.post(
   "/photo",
   requireAuth,
   upload.single("photo"),
   asyncHandler(async (req, res) => {
     if (!req.file) throw badRequest("No file uploaded");
+
+    try {
+      const opt = await optimizePhotoFile(req.file.path);
+      req.file.path = opt.path;
+      req.file.filename = opt.filename;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn("Photo optimize skipped:", e?.message || e);
+    }
 
     const relative = path
       .relative(uploadsRoot, req.file.path)
