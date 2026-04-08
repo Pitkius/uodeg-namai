@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
-import { api } from "../lib/api";
+import { api, getApiBaseUrl } from "../lib/api";
 import { useAuth } from "../contexts/AuthContext";
 
 function resolveMediaUrl(url, version = "") {
   if (!url) return "";
   if (/^https?:\/\//i.test(url)) return url;
-  const base = (import.meta.env.VITE_API_URL || "http://localhost:4000").replace(/\/api\/?$/, "");
+  const base = getApiBaseUrl();
   const clean = `${base}${url.startsWith("/") ? "" : "/"}${url}`;
   return version ? `${clean}?v=${encodeURIComponent(String(version))}` : clean;
 }

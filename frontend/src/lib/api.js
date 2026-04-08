@@ -1,8 +1,23 @@
 import axios from "axios";
 import { getStoredToken, setStoredToken, setStoredUser } from "./storage";
 
+/** Base URL for resolving /uploads/... in the browser (same host in production). */
+export function getApiBaseUrl() {
+  const v = import.meta.env.VITE_API_URL;
+  if (v != null && String(v).trim() !== "") {
+    return String(v).replace(/\/api\/?$/, "");
+  }
+  if (import.meta.env.DEV) return "http://localhost:4000";
+  return "";
+}
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://antiquewhite-marten-664853.hostingersite.com",
+  baseURL: (() => {
+    const v = import.meta.env.VITE_API_URL;
+    if (v != null && String(v).trim() !== "") return String(v);
+    if (import.meta.env.DEV) return "http://localhost:4000";
+    return "";
+  })(),
   timeout: 15000
 });
 
@@ -29,4 +44,3 @@ api.interceptors.response.use(
     return Promise.reject(err);
   }
 );
-

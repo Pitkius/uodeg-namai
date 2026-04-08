@@ -1,4 +1,5 @@
 import express from "express";
+import fs from "fs";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
@@ -37,12 +38,17 @@ async function bootstrap() {
   app.use(helmet());
   app.use(
     cors({
-      origin: env.clientOrigin,
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (env.clientOrigins.includes(origin)) return callback(null, true);
+        return callback(null, false);
+      },
       credentials: true
     })
   );
 
   app.use(
+    "/api",
     rateLimit({
       windowMs: 60 * 1000,
       limit: 200
@@ -74,6 +80,21 @@ async function bootstrap() {
   app.use("/api/uploads", uploadsRouter);
 
   app.use(errorHandler);
+
+  const backendSrcDir = path.dirname(fileURLToPath(import.meta.url));
+  const repoRoot = path.resolve(backendSrcDir, "..", "..");
+  const frontendDist = path.join(repoRoot, "frontend", "dist");
+  const spaIndex = path.join(frontendDist, "index.html");
+
+  if (fs.existsSync(spaIndex)) {
+    app.use(express.static(frontendDist, { index: false }));
+    app.use((req, res, next) => {
+      if (req.method !== "GET" && req.method !== "HEAD") return next();
+      if (req.path.startsWith("/api")) return next();
+      if (req.path.startsWith("/uploads")) return next();
+      return res.sendFile(spaIndex);
+    });
+  }
 
   app.listen(env.port, () => {
     // eslint-disable-next-line no-console

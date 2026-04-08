@@ -5,6 +5,8 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
+    "build:web": "cd ../frontend && npm ci && npm run build",
+    "build": "npm run build:web",
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "seed:admin": "node src/utils/seedAdmin.js",
