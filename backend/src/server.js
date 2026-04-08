@@ -31,6 +31,8 @@ async function bootstrap() {
   }
 
   const app = express();
+  // Behind Hostinger / reverse proxy so rate-limit can read X-Forwarded-For safely
+  app.set("trust proxy", 1);
 
   app.use(helmet());
   app.use(
