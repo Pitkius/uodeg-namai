@@ -1,11 +1,17 @@
 import { HttpError } from "../utils/httpError.js";
 
 export function errorHandler(err, req, res, next) {
-  const status = err instanceof HttpError ? err.status : 500;
+  let status = err instanceof HttpError ? err.status : 500;
   let message =
     err instanceof HttpError
       ? err.message
       : "Server error. Please try again later.";
+
+  // Multer: file too large
+  if (err?.code === "LIMIT_FILE_SIZE" || err?.message === "File too large") {
+    status = 413;
+    message = "Failas per didelis. Pabandyk mažesnę nuotrauką arba padidink MAX_UPLOAD_MB serveryje.";
+  }
 
   if (status === 500 && err?.code === 11000) {
     message = "Šis įrašas jau egzistuoja (pasikartojantis raktas).";

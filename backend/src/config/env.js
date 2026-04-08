@@ -18,7 +18,7 @@ export const env = {
   clientOrigin: clientOriginsResolved[0],
   /** CORS: comma-separated list in CLIENT_ORIGIN, e.g. punycode + ASCII domain */
   clientOrigins: clientOriginsResolved,
-  maxUploadMb: process.env.MAX_UPLOAD_MB ? Number(process.env.MAX_UPLOAD_MB) : 5,
+  maxUploadMb: process.env.MAX_UPLOAD_MB ? Number(process.env.MAX_UPLOAD_MB) : 10,
   superAdminEmail: (process.env.SUPER_ADMIN_EMAIL || "pytka4101@gmail.com").toLowerCase().trim(),
   smtpHost: process.env.SMTP_HOST || "",
   smtpPort: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587,
