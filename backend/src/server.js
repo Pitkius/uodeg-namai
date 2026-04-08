@@ -82,8 +82,14 @@ async function bootstrap() {
   app.use(errorHandler);
 
   const backendSrcDir = path.dirname(fileURLToPath(import.meta.url));
-  const repoRoot = path.resolve(backendSrcDir, "..", "..");
-  const frontendDist = path.join(repoRoot, "frontend", "dist");
+  const backendRoot = path.resolve(backendSrcDir, "..");
+  const repoRoot = path.resolve(backendRoot, "..");
+  const frontendDistCandidates = [
+    path.join(backendRoot, "public", "app"),
+    path.join(repoRoot, "frontend", "dist")
+  ];
+  const frontendDist =
+    frontendDistCandidates.find((dir) => fs.existsSync(path.join(dir, "index.html"))) || frontendDistCandidates[0];
   const spaIndex = path.join(frontendDist, "index.html");
 
   if (fs.existsSync(spaIndex)) {
