@@ -1,0 +1,8 @@
+{
+  "name": "uodeg-namai",
+  "private": true,
+  "scripts": {
+    "build": "npm ci --prefix backend && npm ci --prefix frontend && npm run build --prefix frontend",
+    "start": "node backend/src/server.js"
+  }
+}

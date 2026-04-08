@@ -84,13 +84,26 @@ async function bootstrap() {
   const backendSrcDir = path.dirname(fileURLToPath(import.meta.url));
   const backendRoot = path.resolve(backendSrcDir, "..");
   const repoRoot = path.resolve(backendRoot, "..");
+  const cwd = process.cwd();
   const frontendDistCandidates = [
     path.join(backendRoot, "public", "app"),
+    path.join(cwd, "public", "app"),
+    path.join(cwd, "backend", "public", "app"),
     path.join(repoRoot, "frontend", "dist")
   ];
   const frontendDist =
     frontendDistCandidates.find((dir) => fs.existsSync(path.join(dir, "index.html"))) || frontendDistCandidates[0];
   const spaIndex = path.join(frontendDist, "index.html");
+
+  if (!fs.existsSync(spaIndex)) {
+    // eslint-disable-next-line no-console
+    console.error(
+      "[spa] Missing built frontend. Expected index.html at one of:\n",
+      frontendDistCandidates.map((p) => `  - ${p}`).join("\n"),
+      `\n  cwd=${cwd}\n`,
+      "Run from repo root: npm run build  (or Hostinger: root dir = repo root, Build = npm run build)"
+    );
+  }
 
   if (fs.existsSync(spaIndex)) {
     app.use(express.static(frontendDist, { index: false }));
