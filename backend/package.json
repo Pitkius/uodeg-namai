@@ -5,6 +5,7 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
+    "postinstall": "node scripts/postinstall-web.mjs",
     "build:web": "cd ../frontend && npm ci && npm run build",
     "build": "npm run build:web",
     "dev": "nodemon src/server.js",
