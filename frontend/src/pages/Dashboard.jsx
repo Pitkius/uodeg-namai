@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { api, getApiBaseUrl } from "../lib/api";
 import { useAuth } from "../contexts/AuthContext";
+import { useSeo } from "../lib/seo";
 
 function resolveMediaUrl(url, version = "") {
   if (!url) return "";
@@ -12,6 +13,11 @@ function resolveMediaUrl(url, version = "") {
 
 export function Dashboard() {
   const { user, refreshMe } = useAuth();
+  useSeo({
+    title: "Augintinio profilis",
+    description: "Įkelkite augintinio nuotraukas, valdykite profilį ir peržiūrėkite paskyros informaciją.",
+    path: "/dashboard"
+  });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [deleting, setDeleting] = useState("");
@@ -57,7 +63,7 @@ export function Dashboard() {
           <span className="page-title">Augintinio profilis</span>
         </h1>
         <p className="mt-1 text-sm text-slate-600">
-          Cia galite ikelti suniuko nuotraukas ir matyti jas savo profilyje.
+          Cia galite ikelti augintinio nuotraukas ir matyti jas savo profilyje.
         </p>
 
         <div className="mt-6 flex flex-wrap items-center gap-3">

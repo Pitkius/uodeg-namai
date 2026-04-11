@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useSeo } from "../lib/seo";
 
 export function Register() {
   const { register, loading } = useAuth();
+  useSeo({
+    title: "Registracija",
+    description: "Sukurkite paskyrą Uodegų namuose ir rezervuokite augintinio apsistojimą internetu.",
+    path: "/register"
+  });
   const nav = useNavigate();
 
   const [name, setName] = useState("");

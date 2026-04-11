@@ -1,4 +1,4 @@
-# Šuniukų grožio priežiūra (Dog Grooming) – Full‑stack aplikacija
+# Augintinių priežiūra – Full‑stack aplikacija
 
 Pilna web aplikacija su:
 - `frontend/`: React + Tailwind (Vite)
@@ -9,7 +9,7 @@ Pilna web aplikacija su:
 - Rezervacijos su laisvų laikų (slotų) valdymu
 - Apsauga nuo dvigubų rezervacijų tam pačiam laikui
 - Admin panelė (rezervacijų peržiūra, patvirtinimas, trynimas, slotų valdymas)
-- Prisijungusių vartotojų šunų nuotraukų įkėlimas ir rodymas profilyje
+- Prisijungusių vartotojų augintinių nuotraukų įkėlimas ir rodymas profilyje
 
 ## Paleidimas (lokaliai)
 

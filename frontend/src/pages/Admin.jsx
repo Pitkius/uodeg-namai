@@ -6,6 +6,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import ltLocale from "@fullcalendar/core/locales/lt";
 import { api, getApiBaseUrl } from "../lib/api";
 import { useAuth } from "../contexts/AuthContext";
+import { useSeo } from "../lib/seo";
 
 function iso(d) {
   return new Date(d).toISOString();
@@ -26,6 +27,11 @@ function resolveMediaUrl(url, version = "") {
 }
 export function Admin() {
   const { user } = useAuth();
+  useSeo({
+    title: "Administravimas",
+    description: "Valdykite apsistojimų kalendorių, rezervacijas ir administratoriaus teises.",
+    path: "/admin"
+  });
   const isSuperAdmin = String(user?.email || "").toLowerCase().trim() === "pytka4101@gmail.com";
   const [range, setRange] = useState(() => {
     const now = new Date();
@@ -214,7 +220,7 @@ export function Admin() {
               <span className="page-title">Admin: pilnas valdymas</span>
             </h1>
             <p className="mt-1 text-sm text-slate-600">
-              Matomas pilnas kalendorius, visos pastabos ir savininkų įkeltos šuns nuotraukos.
+              Matomas pilnas kalendorius, visos pastabos ir savininkų įkeltos augintinio nuotraukos.
             </p>
           </div>
           <button className="btn-ghost" onClick={load} disabled={loading}>
@@ -396,7 +402,7 @@ export function Admin() {
                             >
                               <img
                                 src={resolveMediaUrl(p.url, p.uploadedAt || p.filename || p.url)}
-                                alt={p.filename || "Šuns nuotrauka"}
+                                alt={p.filename || "Augintinio nuotrauka"}
                                 className="h-20 w-full object-cover transition group-hover:scale-[1.03]"
                                 loading="lazy"
                               />

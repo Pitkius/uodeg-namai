@@ -28,9 +28,13 @@ export function Layout() {
       <header className="sticky top-0 z-20 border-b border-rose-200/40 bg-gradient-to-r from-sky-100/95 via-white/90 to-rose-100/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-rose-500 via-orange-400 to-amber-400 text-sm font-bold text-white shadow-lg shadow-rose-300/50">
-              UN
-            </div>
+            <img
+              src="/logo.png"
+              alt="Uodegų namai — logotipas"
+              width={40}
+              height={40}
+              className="h-10 w-10 shrink-0 rounded-2xl object-contain bg-[#fff9f4] shadow-lg shadow-rose-300/50 ring-1 ring-white/80"
+            />
             <div className="leading-tight">
               <div className="bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-sm font-bold text-transparent">
                 Uodegų namai
@@ -85,7 +89,7 @@ export function Layout() {
         <div className="mx-auto max-w-6xl px-4 py-8 text-xs text-slate-400">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span>{new Date().getFullYear()} • Uodegų namai</span>
-            <span className="text-rose-300/80">Šilta nakvynė šuneliams</span>
+            <span className="text-rose-300/80">Šilta nakvynė augintiniui</span>
           </div>
         </div>
       </footer>

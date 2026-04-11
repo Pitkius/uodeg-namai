@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom";
+import { useSeo } from "../lib/seo";
 
 export function NotFound() {
+  useSeo({
+    title: "Puslapis nerastas",
+    description: "Ieškomas puslapis nerastas. Grįžkite į Uodegų namų pagrindinį puslapį.",
+    path: "/404"
+  });
   return (
     <div className="mx-auto max-w-lg">
       <div className="card p-6 text-left">

@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useSeo } from "../lib/seo";
 
 export function Login() {
   const { login, requestResetCode, confirmResetPassword, loading } = useAuth();
+  useSeo({
+    title: "Prisijungimas",
+    description: "Prisijunkite prie Uodegų namų paskyros ir valdykite augintinio apsistojimus bei rezervacijas.",
+    path: "/login"
+  });
   const nav = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();

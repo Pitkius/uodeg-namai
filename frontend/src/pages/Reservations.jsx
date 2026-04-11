@@ -3,6 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import ltLocale from "@fullcalendar/core/locales/lt";
 import { api } from "../lib/api";
+import { useSeo } from "../lib/seo";
 
 function iso(d) {
   return new Date(d).toISOString();
@@ -46,6 +47,11 @@ function addOneDay(dateLike) {
 }
 
 export function Reservations() {
+  useSeo({
+    title: "Apsistojimų rezervacijos",
+    description: "Peržiūrėkite laisvus laikus kalendoriuje ir rezervuokite apsistojimą savo augintiniui.",
+    path: "/reservations"
+  });
   const [range, setRange] = useState(() => {
     const now = new Date();
     const from = new Date(now);

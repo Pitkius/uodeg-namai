@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useSeo } from "../lib/seo";
 
 const featureStyles = [
   "from-sky-100 to-cyan-50 ring-sky-200/80 text-sky-950",
@@ -11,6 +12,12 @@ const featureStyles = [
 
 export function Home() {
   const { isAuthed } = useAuth();
+  useSeo({
+    title: "Augintinių priežiūra ir nakvynė",
+    description:
+      "Uodegų namai - patikima augintinių priežiūra ir nakvynė. Registruokite apsistojimą internetu ir valdykite viską vienoje vietoje.",
+    path: "/"
+  });
 
   function initials(name) {
     const parts = String(name || "")
@@ -27,7 +34,7 @@ export function Home() {
     {
       name: "Milda",
       dog: "Luna",
-      text: "Palikom nakčiai pirmą kartą - viskas buvo aišku, o šuniukas grįžo ramus. Tikrai rekomenduoju!",
+      text: "Palikom nakčiai pirmą kartą - viskas buvo aišku, o augintinis grįžo ramus. Tikrai rekomenduoju!",
       photo: "https://images.dog.ceo/breeds/terrier-american/n02093428_1641.jpg",
       rating: 9,
       accent: "from-emerald-400 to-teal-500"
@@ -43,7 +50,7 @@ export function Home() {
     {
       name: "Ieva",
       dog: "Moka",
-      text: "Švaru, tvarkinga, o mūsų šunelis mėgo žaidimų laiką. Užsiregistruosime dar kartą.",
+      text: "Švaru, tvarkinga, o mūsų augintinis mėgo žaidimų laiką. Užsiregistruosime dar kartą.",
       photo: "https://images.dog.ceo/breeds/komondor/n02105505_3967.jpg",
       rating: 10,
       accent: "from-rose-400 to-orange-500"
@@ -61,7 +68,7 @@ export function Home() {
     {
       name: "Rasa L",
       dog: "—",
-      text: "Labai džiaugiuosi matydama, kad šuniukas labai noriai pasilieka pas šią prižiūrėtoją.",
+      text: "Labai džiaugiuosi matydama, kad augintinis labai noriai pasilieka pas šią prižiūrėtoją.",
       photo: "",
       rating: 10,
       accent: "from-sky-400 to-indigo-500"
@@ -145,7 +152,7 @@ export function Home() {
             </h1>
             <p className="mt-3 text-slate-600">
               Pasirink laiką kalendoriuje, pridėk pastabas (jei reikia) ir po apsistojimo turėk
-              savo šuniuko nuotraukas profilyje.
+              savo augintinio nuotraukas profilyje.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -213,7 +220,7 @@ export function Home() {
             <div className="mt-4 rounded-3xl border border-amber-200/80 bg-gradient-to-r from-amber-50 to-rose-50 p-4 shadow-sm">
               <div className="text-sm font-bold text-amber-950">Rekomendacija</div>
               <div className="mt-1 text-sm text-slate-700">
-                Jei šunelis turi savo režimą ar poreikių, palik pastabas rezervuojant.
+                Jei augintinis turi savo režimą ar poreikių, palik pastabas rezervuojant.
               </div>
             </div>
           </div>
@@ -240,7 +247,7 @@ export function Home() {
                   <div>
                     <div className="text-sm font-bold text-slate-900">{t.name}</div>
                     {t.dog && t.dog !== "—" ? (
-                      <div className="text-xs text-slate-600">Šuo: {t.dog}</div>
+                      <div className="text-xs text-slate-600">Augintinis: {t.dog}</div>
                     ) : (
                       <div className="text-xs text-slate-500">Atsiliepimas</div>
                     )}
