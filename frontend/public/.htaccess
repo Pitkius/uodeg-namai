@@ -2,7 +2,7 @@
   RewriteEngine On
   RewriteBase /
 
-  # Do not rewrite API or real files/folders
+  # Do not rewrite API or real files/folders (favicon.ico is a real file in public/)
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_URI} !^/api/
   RewriteCond %{REQUEST_FILENAME} !-f

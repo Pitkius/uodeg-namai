@@ -13,9 +13,9 @@ const featureStyles = [
 export function Home() {
   const { isAuthed } = useAuth();
   useSeo({
-    title: "Augintinių priežiūra ir nakvynė",
+    title: "Gyvūnų viešbutis ir nakvynė augintiniams",
     description:
-      "Uodegų namai - patikima augintinių priežiūra ir nakvynė. Registruokite apsistojimą internetu ir valdykite viską vienoje vietoje.",
+      "Gyvūnų viešbutis Uodegų namai: patikima augintinių nakvynė ir priežiūra. Registruokite apsistojimą internetu ir valdykite viską vienoje vietoje.",
     path: "/"
   });
 
@@ -142,8 +142,8 @@ export function Home() {
         <div className="grid gap-6 p-6 md:grid-cols-2 md:items-center md:p-8">
           <div>
             <div className="inline-flex items-center gap-2 rounded-2xl bg-white/80 px-3 py-1.5 text-sm font-medium text-rose-800 shadow-sm ring-1 ring-rose-200/60">
-              <span>Uodegų namai</span>
-              <span className="text-slate-500">• be streso</span>
+              <span>Gyvūnų viešbutis</span>
+              <span className="text-slate-500">• Uodegų namai</span>
             </div>
 
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
@@ -151,8 +151,8 @@ export function Home() {
               <span className="page-title">nakvynę augintiniui</span>
             </h1>
             <p className="mt-3 text-slate-600">
-              Pasirink laiką kalendoriuje, pridėk pastabas (jei reikia) ir po apsistojimo turėk
-              savo augintinio nuotraukas profilyje.
+              Jei ieškai gyvūnų viešbučio su aiškia tvarka — pasirink laiką kalendoriuje, pridėk
+              pastabas (jei reikia) ir po apsistojimo turėk savo augintinio nuotraukas profilyje.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">

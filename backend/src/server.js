@@ -106,6 +106,18 @@ async function bootstrap() {
   }
 
   if (fs.existsSync(spaIndex)) {
+    const faviconIco = path.join(frontendDist, "favicon.ico");
+    const logoPng = path.join(frontendDist, "logo.png");
+    // Crawlers request /favicon.ico first; SPA fallback must not return HTML here.
+    app.get("/favicon.ico", (_req, res, next) => {
+      const file = fs.existsSync(faviconIco) ? faviconIco : logoPng;
+      if (!fs.existsSync(file)) return next();
+      // favicon.ico is PNG bytes (from public/); correct MIME helps Google pick it up.
+      res.type("image/png");
+      res.set("Cache-Control", "public, max-age=86400");
+      return res.sendFile(file);
+    });
+
     app.use(express.static(frontendDist, { index: false }));
     app.use((req, res, next) => {
       if (req.method !== "GET" && req.method !== "HEAD") return next();
