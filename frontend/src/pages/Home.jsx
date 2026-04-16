@@ -13,7 +13,6 @@ const featureStyles = [
 
 const CONTACT_PHONE_DISPLAY = "+370 62033487";
 const CONTACT_PHONE_TEL = "+37062033487";
-const CONTACT_EMAIL = "ernesta@xn--uodegnamai-sgc.com";
 
 export function Home() {
   const { isAuthed } = useAuth();
@@ -341,12 +340,6 @@ export function Home() {
                 className="inline-flex w-fit items-center rounded-xl border border-sky-200/80 bg-white/90 px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-sky-50"
               >
                 Tel.: {CONTACT_PHONE_DISPLAY}
-              </a>
-              <a
-                href={`mailto:${CONTACT_EMAIL}`}
-                className="inline-flex w-fit items-center rounded-xl border border-sky-200/80 bg-white/90 px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-sky-50"
-              >
-                El. paštas: {CONTACT_EMAIL}
               </a>
             </div>
           </div>
