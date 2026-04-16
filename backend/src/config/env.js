@@ -26,6 +26,7 @@ export const env = {
   smtpUser: process.env.SMTP_USER || "",
   smtpPass: process.env.SMTP_PASS || "",
   smtpFrom: process.env.SMTP_FROM || process.env.SMTP_USER || "",
+  contactInboxEmail: process.env.CONTACT_INBOX_EMAIL || "ernesta@xn--uodegnamai-sgc.com",
   resetCodeTtlMinutes: process.env.RESET_CODE_TTL_MINUTES ? Number(process.env.RESET_CODE_TTL_MINUTES) : 10,
   allowMemoryDbFallback: process.env.ALLOW_MEMORY_DB_FALLBACK === "true"
 };

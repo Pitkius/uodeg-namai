@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { api } from "../lib/api";
 import { useSeo } from "../lib/seo";
 
 const featureStyles = [
@@ -9,6 +10,10 @@ const featureStyles = [
   "from-rose-100 to-pink-50 ring-rose-200/80 text-rose-950",
   "from-violet-100 to-purple-50 ring-violet-200/80 text-violet-950"
 ];
+
+const CONTACT_PHONE_DISPLAY = "+370 62033487";
+const CONTACT_PHONE_TEL = "+37062033487";
+const CONTACT_EMAIL = "ernesta@xn--uodegnamai-sgc.com";
 
 export function Home() {
   const { isAuthed } = useAuth();
@@ -106,6 +111,13 @@ export function Home() {
 
   const [pageIndex, setPageIndex] = useState(0);
   const [anim, setAnim] = useState("in"); // 'in' | 'out'
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactError, setContactError] = useState("");
+  const [contactSuccess, setContactSuccess] = useState("");
 
   useEffect(() => {
     if (!testimonials.length) return;
@@ -135,6 +147,30 @@ export function Home() {
     { title: "Žaidimai", desc: "Ramina, užima ir padeda adaptuotis." },
     { title: "Nuotraukos", desc: "Viskas vienoje vietoje profilyje." }
   ];
+
+  async function submitContactForm(e) {
+    e.preventDefault();
+    setContactError("");
+    setContactSuccess("");
+    setContactLoading(true);
+    try {
+      await api.post("/api/contact", {
+        name: contactName,
+        email: contactEmail,
+        phone: contactPhone,
+        message: contactMessage
+      });
+      setContactName("");
+      setContactEmail("");
+      setContactPhone("");
+      setContactMessage("");
+      setContactSuccess("Ačiū! Žinutė išsiųsta. Susisieksime su jumis netrukus.");
+    } catch (err) {
+      setContactError(err?.response?.data?.message || "Nepavyko išsiųsti žinutės. Pabandykite dar kartą.");
+    } finally {
+      setContactLoading(false);
+    }
+  }
 
   return (
     <div className="grid gap-10">
@@ -288,6 +324,91 @@ export function Home() {
               Kiti 3
             </button>
           </div>
+        </div>
+      </section>
+
+      <section className="card border-0 bg-gradient-to-br from-slate-900/5 via-sky-50/40 to-rose-50/40 p-6 ring-1 ring-sky-100/70">
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="text-left">
+            <h2 className="text-xl font-bold text-slate-900">Susisiekite</h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Parašykite mums per formą, į el. paštą arba paskambinkite. Atsakome kuo greičiau.
+            </p>
+
+            <div className="mt-4 grid gap-3">
+              <a
+                href={`tel:${CONTACT_PHONE_TEL}`}
+                className="inline-flex w-fit items-center rounded-xl border border-sky-200/80 bg-white/90 px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-sky-50"
+              >
+                Tel.: {CONTACT_PHONE_DISPLAY}
+              </a>
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="inline-flex w-fit items-center rounded-xl border border-sky-200/80 bg-white/90 px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-sky-50"
+              >
+                El. paštas: {CONTACT_EMAIL}
+              </a>
+            </div>
+          </div>
+
+          <form className="grid gap-3 rounded-2xl bg-white/90 p-4 ring-1 ring-slate-200/70" onSubmit={submitContactForm}>
+            <div>
+              <label className="label">Vardas</label>
+              <input
+                className="input mt-1"
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                required
+                minLength={2}
+                maxLength={120}
+              />
+            </div>
+
+            <div>
+              <label className="label">El. paštas</label>
+              <input
+                className="input mt-1"
+                type="email"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                required
+                maxLength={200}
+              />
+            </div>
+
+            <div>
+              <label className="label">Telefono numeris (nebūtina)</label>
+              <input
+                className="input mt-1"
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                maxLength={40}
+              />
+            </div>
+
+            <div>
+              <label className="label">Žinutė</label>
+              <textarea
+                className="input mt-1 min-h-28 resize-y"
+                value={contactMessage}
+                onChange={(e) => setContactMessage(e.target.value)}
+                required
+                minLength={10}
+                maxLength={3000}
+              />
+            </div>
+
+            {contactError ? <div className="error">{contactError}</div> : null}
+            {contactSuccess ? (
+              <div className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-200">
+                {contactSuccess}
+              </div>
+            ) : null}
+
+            <button className="btn-primary" type="submit" disabled={contactLoading}>
+              {contactLoading ? "Siunčiama..." : "Siųsti žinutę"}
+            </button>
+          </form>
         </div>
       </section>
     </div>

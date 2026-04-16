@@ -5,6 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
 import { env } from "../config/env.js";
 import { User } from "../models/User.js";
+import { ContactMessage } from "../models/ContactMessage.js";
 import { badRequest } from "../utils/httpError.js";
 
 export const adminRouter = express.Router();
@@ -79,5 +80,31 @@ adminRouter.delete(
     // “Ištrinti adminą” = nuimti admin teises (paliekame vartotoją dėl istorijos/rezervacijų).
     await User.updateOne({ _id: target._id }, { $set: { role: "user" } });
     res.json({ ok: true });
+  })
+);
+
+adminRouter.get(
+  "/contact-messages",
+  asyncHandler(async (req, res) => {
+    const limitRaw = Number(req.query.limit || 100);
+    const limit = Number.isFinite(limitRaw) ? Math.max(1, Math.min(200, limitRaw)) : 100;
+    const messages = await ContactMessage.find({})
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+    res.json({ messages });
+  })
+);
+
+adminRouter.patch(
+  "/contact-messages/:id/read",
+  asyncHandler(async (req, res) => {
+    const message = await ContactMessage.findByIdAndUpdate(
+      req.params.id,
+      { $set: { isRead: true } },
+      { new: true }
+    ).lean();
+    if (!message) throw badRequest("Zinute nerasta");
+    res.json({ message });
   })
 );

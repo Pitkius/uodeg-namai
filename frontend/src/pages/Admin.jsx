@@ -45,6 +45,7 @@ export function Admin() {
   const [slots, setSlots] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [admins, setAdmins] = useState([]);
+  const [contactMessages, setContactMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -60,14 +61,16 @@ export function Admin() {
     setLoading(true);
     setError("");
     try {
-      const [slotsRes, resRes, adminsRes] = await Promise.all([
+      const [slotsRes, resRes, adminsRes, contactRes] = await Promise.all([
         api.get("/api/slots", { params: { from: iso(range.from), to: iso(range.to) } }),
         api.get("/api/reservations", { params: { from: iso(range.from), to: iso(range.to) } }),
-        api.get("/api/admin/admins")
+        api.get("/api/admin/admins"),
+        api.get("/api/admin/contact-messages", { params: { limit: 100 } })
       ]);
       setSlots(slotsRes.data.slots || []);
       setReservations(resRes.data.reservations || []);
       setAdmins(adminsRes.data.admins || []);
+      setContactMessages(contactRes.data.messages || []);
     } catch (e) {
       setError(e?.response?.data?.message || "Nepavyko užkrauti duomenų");
     } finally {
@@ -211,6 +214,27 @@ export function Admin() {
     }
   }
 
+  async function markMessageRead(messageId) {
+    setError("");
+    setSuccess("");
+    try {
+      await api.patch(`/api/admin/contact-messages/${messageId}/read`);
+      setContactMessages((prev) =>
+        prev.map((msg) =>
+          String(msg._id) === String(messageId)
+            ? {
+                ...msg,
+                isRead: true
+              }
+            : msg
+        )
+      );
+      setSuccess("Žinutė pažymėta kaip perskaityta");
+    } catch (e) {
+      setError(e?.response?.data?.message || "Nepavyko atnaujinti žinutės");
+    }
+  }
+
   return (
     <div className="grid gap-6">
       <div className="card overflow-hidden border-0 bg-gradient-to-br from-slate-900/5 via-sky-50/50 to-rose-50/40 p-6 text-left ring-1 ring-sky-100/80">
@@ -351,6 +375,53 @@ export function Admin() {
               ))
             )}
           </div>
+        </div>
+      </div>
+
+      <div className="card border-0 bg-gradient-to-br from-sky-50/80 to-indigo-50/50 p-6 text-left ring-1 ring-sky-100/60">
+        <h2 className="text-lg font-bold text-slate-900">Kontaktų formos žinutės</h2>
+        <div className="mt-3 grid gap-3">
+          {contactMessages.length === 0 ? (
+            <div className="rounded-xl border border-sky-200/60 bg-white/80 p-4 text-sm text-slate-600">
+              Kol kas nėra gautų žinučių.
+            </div>
+          ) : (
+            contactMessages.map((m) => (
+              <div
+                key={m._id}
+                className="rounded-xl border border-white/80 bg-white/95 p-4 shadow-sm ring-1 ring-sky-100/50"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="text-sm font-semibold text-slate-900">{m.name}</div>
+                    <div className="text-xs text-slate-600">{m.email}</div>
+                    <div className="text-xs text-slate-600">Tel.: {m.phone || "-"}</div>
+                    <div className="mt-1 text-xs text-slate-500">
+                      Gauta: {new Date(m.createdAt).toLocaleString("lt-LT")}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={[
+                        "rounded-lg px-2 py-1 text-xs font-semibold",
+                        m.isRead ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-900"
+                      ].join(" ")}
+                    >
+                      {m.isRead ? "Perskaityta" : "Nauja"}
+                    </span>
+                    {!m.isRead ? (
+                      <button className="btn-ghost" onClick={() => markMessageRead(m._id)}>
+                        Žymėti perskaityta
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+                <div className="mt-3 rounded-xl bg-slate-50 p-3 text-sm text-slate-700 ring-1 ring-slate-200">
+                  {m.message}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 

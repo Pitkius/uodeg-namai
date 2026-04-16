@@ -62,20 +62,6 @@ export function Layout() {
           </nav>
 
           <div className="flex flex-shrink-0 items-center gap-2 sm:gap-3">
-            {isAuthed && isAdmin ? (
-              <NavLink
-                to="/admin"
-                title="Administravimas"
-                className={({ isActive }) =>
-                  [
-                    "md:hidden rounded-xl border border-violet-300/80 bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white shadow-md shadow-violet-400/30 ring-1 ring-white/30",
-                    isActive ? "ring-2 ring-amber-300 ring-offset-1 ring-offset-white" : "active:scale-[0.98]"
-                  ].join(" ")
-                }
-              >
-                Admin
-              </NavLink>
-            ) : null}
             {isAuthed ? (
               <>
                 <div className="hidden text-right md:block">
@@ -93,6 +79,23 @@ export function Layout() {
             )}
           </div>
         </div>
+
+        {isAuthed && isAdmin ? (
+          <div className="mx-auto w-full max-w-6xl px-4 pb-2 md:hidden">
+            <NavLink
+              to="/admin"
+              title="Administravimas"
+              className={({ isActive }) =>
+                [
+                  "block rounded-xl border border-violet-300/80 bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-2 text-center text-xs font-bold uppercase tracking-wide text-white shadow-md shadow-violet-400/30 ring-1 ring-white/30",
+                  isActive ? "ring-2 ring-amber-300 ring-offset-1 ring-offset-white" : "active:scale-[0.98]"
+                ].join(" ")
+              }
+            >
+              Admin skydelis
+            </NavLink>
+          </div>
+        ) : null}
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8">

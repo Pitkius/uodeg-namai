@@ -77,3 +77,51 @@ export async function sendPasswordChangedEmail(toEmail, name) {
     html: `<p>Sveiki, <b>${safeName}</b>.</p><p>Jusu paskyros slaptazodis buvo sekmingai pakeistas.</p>`
   });
 }
+
+export async function sendContactMessageEmail({ name, email, phone, message }) {
+  const tx = getTransporter();
+  const toEmail = env.contactInboxEmail || env.smtpFrom;
+  const subject = `Nauja zinute is kontaktu formos (${name})`;
+  const plain = [
+    "Gauta nauja zinute is svetaineje esancios kontaktu formos.",
+    "",
+    `Vardas: ${name}`,
+    `El. pastas: ${email}`,
+    `Telefonas: ${phone || "-"}`,
+    "",
+    "Zinute:",
+    message
+  ].join("\n");
+
+  if (!toEmail) {
+    // eslint-disable-next-line no-console
+    console.warn("[mail] Contact form email NOT sent: CONTACT_INBOX_EMAIL/SMTP_FROM is missing.");
+    // eslint-disable-next-line no-console
+    console.log(`[contact-message] from=${email}, name=${name}, phone=${phone || "-"}\n${message}`);
+    return;
+  }
+
+  if (!tx) {
+    // eslint-disable-next-line no-console
+    console.warn("[mail] Contact form email NOT sent: SMTP not configured.");
+    // eslint-disable-next-line no-console
+    console.log(`[contact-message->${toEmail}] ${plain}`);
+    return;
+  }
+
+  await tx.sendMail({
+    from: env.smtpFrom || toEmail,
+    to: toEmail,
+    replyTo: email,
+    subject,
+    text: plain,
+    html: `
+      <p><b>Gauta nauja zinute is kontaktu formos.</b></p>
+      <p><b>Vardas:</b> ${name}</p>
+      <p><b>El. pastas:</b> ${email}</p>
+      <p><b>Telefonas:</b> ${phone || "-"}</p>
+      <p><b>Zinute:</b></p>
+      <p>${String(message).replace(/\n/g, "<br/>")}</p>
+    `
+  });
+}

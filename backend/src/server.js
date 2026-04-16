@@ -17,6 +17,7 @@ import { adminRouter } from "./routes/admin.js";
 import { slotsRouter } from "./routes/slots.js";
 import { reservationsRouter } from "./routes/reservations.js";
 import { uploadsRouter } from "./routes/uploads.js";
+import { contactRouter } from "./routes/contact.js";
 
 async function bootstrap() {
   assertEnv();
@@ -78,6 +79,7 @@ async function bootstrap() {
   app.use("/api/slots", slotsRouter);
   app.use("/api/reservations", reservationsRouter);
   app.use("/api/uploads", uploadsRouter);
+  app.use("/api/contact", contactRouter);
 
   app.use(errorHandler);
 
