@@ -4,9 +4,11 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import ltLocale from "@fullcalendar/core/locales/lt";
-import { api, getApiBaseUrl } from "../lib/api";
+import { api } from "../lib/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useSeo } from "../lib/seo";
+import { AuthImage } from "../components/AuthImage";
+import { AdminChatPanel } from "../components/AdminChatPanel";
 
 function iso(d) {
   return new Date(d).toISOString();
@@ -18,21 +20,13 @@ function toLocalInputValue(date) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-function resolveMediaUrl(url, version = "") {
-  if (!url) return "";
-  if (/^https?:\/\//i.test(url)) return url;
-  const base = getApiBaseUrl();
-  const clean = `${base}${url.startsWith("/") ? "" : "/"}${url}`;
-  return version ? `${clean}?v=${encodeURIComponent(String(version))}` : clean;
-}
 export function Admin() {
-  const { user } = useAuth();
+  const { user, isSuperAdmin } = useAuth();
   useSeo({
     title: "Administravimas",
     description: "Valdykite apsistojimų kalendorių, rezervacijas ir administratoriaus teises.",
     path: "/admin"
   });
-  const isSuperAdmin = String(user?.email || "").toLowerCase().trim() === "pytka4101@gmail.com";
   const [range, setRange] = useState(() => {
     const now = new Date();
     const from = new Date(now);
@@ -245,6 +239,7 @@ export function Admin() {
             </h1>
             <p className="mt-1 text-sm text-slate-600">
               Matomas pilnas kalendorius, visos pastabos ir savininkų įkeltos augintinio nuotraukos.
+              Prisijungęs kaip {user?.name}.
             </p>
           </div>
           <button className="btn-ghost" onClick={load} disabled={loading}>
@@ -253,19 +248,46 @@ export function Admin() {
         </div>
 
         {error ? <div className="mt-3 error">{error}</div> : null}
-        {success ? <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-200">{success}</div> : null}
+        {success ? (
+          <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 ring-1 ring-emerald-200">
+            {success}
+          </div>
+        ) : null}
+      </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+      <AdminChatPanel
+        onError={(msg) => {
+          setError(msg);
+          setSuccess("");
+        }}
+        onSuccess={(msg) => {
+          setSuccess(msg);
+          setError("");
+        }}
+      />
+
+      <div className="card overflow-hidden border-0 bg-gradient-to-br from-slate-900/5 via-sky-50/50 to-rose-50/40 p-6 text-left ring-1 ring-sky-100/80">
+        <div className="grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-sky-200/60 bg-gradient-to-br from-sky-100/80 to-violet-50/60 p-4 md:col-span-1">
             <div className="text-sm font-semibold text-slate-900">Pridėti apsistojimo slotą</div>
             <div className="mt-3 grid gap-3">
               <div>
                 <div className="label">Pradžia</div>
-                <input className="input mt-1" type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} />
+                <input
+                  className="input mt-1"
+                  type="datetime-local"
+                  value={start}
+                  onChange={(e) => setStart(e.target.value)}
+                />
               </div>
               <div>
                 <div className="label">Pabaiga</div>
-                <input className="input mt-1" type="datetime-local" value={end} onChange={(e) => setEnd(e.target.value)} />
+                <input
+                  className="input mt-1"
+                  type="datetime-local"
+                  value={end}
+                  onChange={(e) => setEnd(e.target.value)}
+                />
               </div>
               <button className="btn-primary" onClick={createSlot}>
                 Pridėti
@@ -311,33 +333,56 @@ export function Admin() {
           {isSuperAdmin ? (
             <form className="mt-3 grid gap-3" onSubmit={createAdmin}>
               <div>
-                <div className="label">Vardas</div>
-                <input className="input mt-1" value={adminName} onChange={(e) => setAdminName(e.target.value)} required />
+                <div className="label">Vardas (pvz. Ernesta / Patricija / Pijus)</div>
+                <input
+                  className="input mt-1"
+                  value={adminName}
+                  onChange={(e) => setAdminName(e.target.value)}
+                  required
+                />
               </div>
               <div>
-                <div className="label">El. paštas</div>
-                <input className="input mt-1" type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} required />
+                <div className="label">El. paštas (Gmail)</div>
+                <input
+                  className="input mt-1"
+                  type="email"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  required
+                />
               </div>
               <div>
                 <div className="label">Slaptažodis</div>
-                <input className="input mt-1" type="password" minLength={8} value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} required />
+                <input
+                  className="input mt-1"
+                  type="password"
+                  minLength={8}
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  required
+                />
               </div>
-              <button className="btn-primary" type="submit">Pridėti admin</button>
+              <button className="btn-primary" type="submit">
+                Pridėti admin
+              </button>
             </form>
           ) : (
             <div className="mt-3 rounded-xl bg-white/80 p-3 text-sm text-slate-700 ring-1 ring-indigo-100">
-              Tik pagrindinis adminas <strong>pytka4101@gmail.com</strong> gali pridėti arba istrinti adminus.
+              Tik pagrindinis adminas gali pridėti arba ištrinti adminus.
             </div>
           )}
 
           <div className="mt-4 grid gap-2">
             {admins.map((a) => (
-              <div key={a._id} className="flex items-center justify-between gap-3 rounded-xl bg-white/90 p-3 ring-1 ring-indigo-100">
+              <div
+                key={a._id}
+                className="flex items-center justify-between gap-3 rounded-xl bg-white/90 p-3 ring-1 ring-indigo-100"
+              >
                 <div>
                   <div className="text-sm font-semibold text-slate-900">{a.name}</div>
                   <div className="text-xs text-slate-600">{a.email}</div>
                 </div>
-                {isSuperAdmin && String(a.email).toLowerCase().trim() !== "pytka4101@gmail.com" ? (
+                {isSuperAdmin && String(a._id) !== String(user?.id) ? (
                   <button className="btn-ghost" onClick={() => removeAdmin(a._id)}>
                     Ištrinti admin
                   </button>
@@ -355,24 +400,27 @@ export function Admin() {
                 Nėra apsistojimo slotų šiame intervale.
               </div>
             ) : (
-              slots.slice().sort((a, b) => new Date(a.start) - new Date(b.start)).map((s) => (
-                <div
-                  key={s._id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/80 bg-white/90 p-4 shadow-sm ring-1 ring-emerald-100/50"
-                >
-                  <div>
-                    <div className="text-sm font-medium text-slate-900">
-                      {new Date(s.start).toLocaleString("lt-LT")}
+              slots
+                .slice()
+                .sort((a, b) => new Date(a.start) - new Date(b.start))
+                .map((s) => (
+                  <div
+                    key={s._id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/80 bg-white/90 p-4 shadow-sm ring-1 ring-emerald-100/50"
+                  >
+                    <div>
+                      <div className="text-sm font-medium text-slate-900">
+                        {new Date(s.start).toLocaleString("lt-LT")}
+                      </div>
+                      <div className="text-xs text-slate-600">
+                        Trukmė: {Math.round((new Date(s.end) - new Date(s.start)) / (60 * 1000))} min.
+                      </div>
                     </div>
-                    <div className="text-xs text-slate-600">
-                      Trukmė: {Math.round((new Date(s.end) - new Date(s.start)) / (60 * 1000))} min.
-                    </div>
+                    <button className="btn-ghost" onClick={() => removeSlot(s._id)}>
+                      Pašalinti slotą
+                    </button>
                   </div>
-                  <button className="btn-ghost" onClick={() => removeSlot(s._id)}>
-                    Pašalinti slotą
-                  </button>
-                </div>
-              ))
+                ))
             )}
           </div>
         </div>
@@ -446,13 +494,17 @@ export function Admin() {
                       <div className="text-sm font-semibold text-slate-900">{r.ownerName || r.userName}</div>
                       <div className="text-xs text-slate-600">{r.ownerEmail || "be el. pašto"}</div>
                       <div className="mt-1 text-xs text-slate-600">
-                        {new Date(r.start).toLocaleDateString("lt-LT")} - {new Date(r.end).toLocaleDateString("lt-LT")}{" "}
-                        (išvykimas)
+                        {new Date(r.start).toLocaleDateString("lt-LT")} -{" "}
+                        {new Date(r.end).toLocaleDateString("lt-LT")} (išvykimas)
                       </div>
                       <div className="mt-1 text-xs text-slate-600">
                         Statusas:{" "}
                         <span className="font-medium text-slate-900">
-                          {r.status === "pending" ? "laukiama" : r.status === "confirmed" ? "patvirtinta" : "atšaukta"}
+                          {r.status === "pending"
+                            ? "laukiama"
+                            : r.status === "confirmed"
+                              ? "patvirtinta"
+                              : "atšaukta"}
                         </span>
                       </div>
                       <div className="mt-2 text-xs text-slate-700">
@@ -464,20 +516,17 @@ export function Admin() {
                           <div className="rounded-lg bg-slate-100 p-2 text-xs text-slate-500">Nuotraukų nėra</div>
                         ) : (
                           (r.ownerPhotos || []).slice(0, 8).map((p) => (
-                            <a
+                            <div
                               key={`${r._id}-${p.url}`}
-                              href={resolveMediaUrl(p.url, p.uploadedAt || p.filename || p.url)}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="group overflow-hidden rounded-lg ring-1 ring-slate-200"
+                              className="overflow-hidden rounded-lg ring-1 ring-slate-200"
                             >
-                              <img
-                                src={resolveMediaUrl(p.url, p.uploadedAt || p.filename || p.url)}
+                              <AuthImage
+                                src={p.url}
+                                version={p.uploadedAt || p.filename || p.url}
                                 alt={p.filename || "Augintinio nuotrauka"}
-                                className="h-20 w-full object-cover transition group-hover:scale-[1.03]"
-                                loading="lazy"
+                                className="h-20 w-full object-cover"
                               />
-                            </a>
+                            </div>
                           ))
                         )}
                       </div>
@@ -502,4 +551,3 @@ export function Admin() {
     </div>
   );
 }
-

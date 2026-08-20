@@ -2,19 +2,18 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { requireAuth, requireAdmin } from "../middleware/auth.js";
-import { env } from "../config/env.js";
+import { requireAuth, requireAdmin, isSuperAdminEmail } from "../middleware/auth.js";
 import { User } from "../models/User.js";
 import { ContactMessage } from "../models/ContactMessage.js";
 import { badRequest } from "../utils/httpError.js";
+import { passwordSchemaRefine } from "../utils/passwordPolicy.js";
 
 export const adminRouter = express.Router();
 
 adminRouter.use(requireAuth, requireAdmin);
 
 function requireSuperAdmin(req, res, next) {
-  const email = String(req.user?.email || "").toLowerCase().trim();
-  if (email !== env.superAdminEmail) {
+  if (!isSuperAdminEmail(req.user?.email)) {
     return next(badRequest("Tik pagrindinis adminas gali valdyti adminus"));
   }
   return next();
@@ -27,15 +26,20 @@ adminRouter.get(
       .select("_id name email createdAt")
       .sort({ createdAt: -1 })
       .lean();
-    res.json({ admins });
+    res.json({
+      admins,
+      isSuperAdmin: isSuperAdminEmail(req.user.email)
+    });
   })
 );
 
-const createAdminSchema = z.object({
-  name: z.string().min(2).max(80),
-  email: z.string().email(),
-  password: z.string().min(8).max(200)
-});
+const createAdminSchema = z
+  .object({
+    name: z.string().min(2).max(80),
+    email: z.string().email(),
+    password: z.string().min(8).max(200)
+  })
+  .superRefine((data, ctx) => passwordSchemaRefine(data.password, ctx));
 
 adminRouter.post(
   "/admins",
@@ -53,7 +57,10 @@ adminRouter.post(
       const passwordHash = await bcrypt.hash(password, 12);
       await User.updateOne(
         { _id: existing._id },
-        { $set: { name, role: "admin", passwordHash } }
+        {
+          $set: { name, role: "admin", passwordHash },
+          $inc: { tokenVersion: 1 }
+        }
       );
       const admin = await User.findById(existing._id).select("_id name email role").lean();
       return res.json({ admin, updated: true });
@@ -74,11 +81,10 @@ adminRouter.delete(
   asyncHandler(async (req, res) => {
     const target = await User.findById(req.params.id).select("_id email role").lean();
     if (!target) throw badRequest("Admin nerastas");
-    if (String(target.email).toLowerCase().trim() === env.superAdminEmail) {
+    if (isSuperAdminEmail(target.email)) {
       throw badRequest("Negalima istrinti pagrindinio admino");
     }
-    // “Ištrinti adminą” = nuimti admin teises (paliekame vartotoją dėl istorijos/rezervacijų).
-    await User.updateOne({ _id: target._id }, { $set: { role: "user" } });
+    await User.updateOne({ _id: target._id }, { $set: { role: "user" }, $inc: { tokenVersion: 1 } });
     res.json({ ok: true });
   })
 );

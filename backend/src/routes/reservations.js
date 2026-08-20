@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
 import { AvailabilitySlot } from "../models/AvailabilitySlot.js";
 import { Reservation } from "../models/Reservation.js";
+import { StayNight } from "../models/StayNight.js";
 import { badRequest, notFound } from "../utils/httpError.js";
 
 export const reservationsRouter = express.Router();
@@ -17,6 +18,25 @@ function parseYmd(s) {
   return new Date(y, mo - 1, d, 0, 0, 0, 0);
 }
 
+function formatYmd(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/** Nights occupied: check-in … day before check-out */
+function stayNightKeys(start, end) {
+  const keys = [];
+  const cur = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+  const last = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+  while (cur < last) {
+    keys.push(formatYmd(cur));
+    cur.setDate(cur.getDate() + 1);
+  }
+  return keys;
+}
+
 async function hasOverlap(start, end) {
   return Reservation.findOne({
     status: { $in: ["pending", "confirmed"] },
@@ -25,6 +45,10 @@ async function hasOverlap(start, end) {
   })
     .select("_id")
     .lean();
+}
+
+async function releaseStayNights(reservationId) {
+  await StayNight.deleteMany({ reservationId });
 }
 
 // Public: get booked slot IDs (no PII)
@@ -144,6 +168,9 @@ reservationsRouter.post(
     const overlap = await hasOverlap(start, end);
     if (overlap) throw badRequest("Šios dienos jau užimtos");
 
+    const nightKeys = stayNightKeys(start, end);
+    if (!nightKeys.length) throw badRequest("Check-out must be after check-in");
+
     const reservation = await Reservation.create({
       userId: req.user._id,
       userName: req.user.name,
@@ -153,6 +180,18 @@ reservationsRouter.post(
       notes: parsed.data.notes || "",
       status: "pending"
     });
+
+    try {
+      await StayNight.insertMany(
+        nightKeys.map((dateKey) => ({ dateKey, reservationId: reservation._id })),
+        { ordered: true }
+      );
+    } catch (e) {
+      await Reservation.findByIdAndDelete(reservation._id).catch(() => {});
+      if (e?.code === 11000) throw badRequest("Šios dienos jau užimtos");
+      throw e;
+    }
+
     res.status(201).json({ reservation });
   })
 );
@@ -209,6 +248,7 @@ reservationsRouter.delete(
       { new: true }
     );
     if (!reservation) throw notFound("Reservation not found");
+    await releaseStayNights(reservation._id);
     res.json({ reservation });
   })
 );
@@ -237,6 +277,7 @@ reservationsRouter.delete(
   asyncHandler(async (req, res) => {
     const reservation = await Reservation.findByIdAndDelete(req.params.id);
     if (!reservation) throw notFound("Reservation not found");
+    await releaseStayNights(reservation._id);
     res.json({ ok: true });
   })
 );

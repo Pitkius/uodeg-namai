@@ -32,7 +32,6 @@ export function Login() {
 
     setShowResetForm(true);
     setResetEmail(searchParams.get("email") || "");
-    setResetCode(searchParams.get("code") || "");
   }, [searchParams]);
 
   async function onSubmit(e) {
@@ -138,7 +137,7 @@ export function Login() {
                 <input className="input mt-1" value={resetCode} onChange={(e) => setResetCode(e.target.value)} />
               </div>
               <div>
-                <div className="label">Naujas slaptazodis (min. 8 simboliai)</div>
+                <div className="label">Naujas slaptazodis (bent 8 simb., raide ir skaicius)</div>
                 <input
                   className="input mt-1"
                   type="password"

@@ -4,7 +4,6 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import rateLimit from "express-rate-limit";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -18,10 +17,36 @@ import { slotsRouter } from "./routes/slots.js";
 import { reservationsRouter } from "./routes/reservations.js";
 import { uploadsRouter } from "./routes/uploads.js";
 import { contactRouter } from "./routes/contact.js";
+import { chatRouter } from "./routes/chat.js";
+import { apiLimiter } from "./utils/rateLimits.js";
 
 async function bootstrap() {
   assertEnv();
   await connectDb(env.mongoUri, { allowMemoryDbFallback: env.allowMemoryDbFallback });
+
+  if (process.env.SEED_ADMIN_ON_START === "true" || env.allowMemoryDbFallback) {
+    try {
+      const { User } = await import("./models/User.js");
+      const bcrypt = (await import("bcryptjs")).default;
+      const email = (process.env.ADMIN_EMAIL || env.superAdminEmail || "admin@local.test").toLowerCase();
+      const password = process.env.ADMIN_PASSWORD || "Admin12345";
+      const name = process.env.ADMIN_NAME || "Ernesta";
+      const existing = await User.findOne({ email }).select("_id");
+      if (!existing) {
+        const passwordHash = await bcrypt.hash(password, 12);
+        await User.create({ name, email, passwordHash, role: "admin" });
+        // eslint-disable-next-line no-console
+        console.log(`[seed] Admin created: ${email} / ${password} (${name})`);
+      } else {
+        await User.updateOne({ _id: existing._id }, { $set: { role: "admin", name } });
+        // eslint-disable-next-line no-console
+        console.log(`[seed] Admin ready: ${email} (${name})`);
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error("[seed] failed:", e?.message || e);
+    }
+  }
 
   try {
     await Reservation.syncIndexes();
@@ -32,11 +57,32 @@ async function bootstrap() {
     console.error("Reservation.syncIndexes failed:", e?.message || e);
   }
 
+  try {
+    const { StayNight } = await import("./models/StayNight.js");
+    await StayNight.syncIndexes();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("StayNight.syncIndexes failed:", e?.message || e);
+  }
+
+  try {
+    const { ChatThread, ChatMessage } = await import("./models/Chat.js");
+    await ChatThread.syncIndexes();
+    await ChatMessage.syncIndexes();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("Chat indexes sync failed:", e?.message || e);
+  }
+
   const app = express();
   // Behind Hostinger / reverse proxy so rate-limit can read X-Forwarded-For safely
   app.set("trust proxy", 1);
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: "same-site" }
+    })
+  );
   app.use(
     cors({
       origin: (origin, callback) => {
@@ -48,29 +94,14 @@ async function bootstrap() {
     })
   );
 
-  app.use(
-    "/api",
-    rateLimit({
-      windowMs: 60 * 1000,
-      limit: 200
-    })
-  );
+  app.use("/api", apiLimiter);
 
-  app.use(morgan("dev"));
+  app.use(morgan(env.isProd ? "combined" : "dev"));
   app.use(cookieParser());
   app.use(express.json({ limit: "1mb" }));
 
-  // Static uploads
-  const uploadsDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "uploads");
-  app.use(
-    "/uploads",
-    (req, res, next) => {
-      // Frontend runs on another origin (localhost:5173), so allow image embedding.
-      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-      next();
-    },
-    express.static(uploadsDir)
-  );
+  // User photos are served only via authenticated /api/uploads/file/...
+  // (no public /uploads static listing)
 
   app.get("/api/health", (req, res) => res.json({ ok: true }));
 
@@ -80,6 +111,7 @@ async function bootstrap() {
   app.use("/api/reservations", reservationsRouter);
   app.use("/api/uploads", uploadsRouter);
   app.use("/api/contact", contactRouter);
+  app.use("/api/chat", chatRouter);
 
   app.use(errorHandler);
 
@@ -140,5 +172,3 @@ bootstrap().catch((e) => {
   console.error("Server bootstrap failed:", e?.message || e);
   process.exit(1);
 });
-
-

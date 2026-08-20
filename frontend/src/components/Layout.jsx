@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { ChatWidget } from "./ChatWidget";
 
 function NavItem({ to, children, end }) {
   return (
@@ -110,6 +111,8 @@ export function Layout() {
           </div>
         </div>
       </footer>
+
+      <ChatWidget />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { badRequest } from "../utils/httpError.js";
 import { ContactMessage } from "../models/ContactMessage.js";
 import { sendContactMessageEmail } from "../utils/mailer.js";
+import { contactLimiter } from "../utils/rateLimits.js";
 
 export const contactRouter = express.Router();
 
@@ -16,6 +17,7 @@ const contactSchema = z.object({
 
 contactRouter.post(
   "/",
+  contactLimiter,
   asyncHandler(async (req, res) => {
     const parsed = contactSchema.safeParse(req.body);
     if (!parsed.success) {

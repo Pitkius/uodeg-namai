@@ -45,12 +45,14 @@ export function Register() {
             <input className="input mt-1" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div>
-            <div className="label">Slaptažodis (min. 8 simboliai)</div>
+            <div className="label">Slaptažodis (bent 8 simb., raidė ir skaičius)</div>
             <input
               className="input mt-1"
               type="password"
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
 

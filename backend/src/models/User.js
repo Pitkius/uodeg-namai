@@ -17,10 +17,11 @@ const userSchema = new mongoose.Schema(
     resetCodeHash: { type: String, default: "" },
     resetCodeExpiresAt: { type: Date, default: null },
     role: { type: String, enum: ["user", "admin"], default: "user" },
+    /** Bumped on password change to invalidate existing JWTs */
+    tokenVersion: { type: Number, default: 0 },
     photos: { type: [photoSchema], default: [] }
   },
   { timestamps: true }
 );
 
 export const User = mongoose.model("User", userSchema);
-

@@ -64,10 +64,20 @@ slotsRouter.delete(
     if (!slot) return res.status(404).json({ message: "Slot not found" });
 
     // Cancel any pending reservations for this slot
+    const cancelled = await Reservation.find({
+      slotId: slot._id,
+      status: { $in: ["pending", "confirmed"] }
+    })
+      .select("_id")
+      .lean();
     await Reservation.updateMany(
       { slotId: slot._id, status: { $in: ["pending", "confirmed"] } },
       { $set: { status: "cancelled" } }
     );
+    if (cancelled.length) {
+      const { StayNight } = await import("../models/StayNight.js");
+      await StayNight.deleteMany({ reservationId: { $in: cancelled.map((r) => r._id) } });
+    }
 
     res.json({ slot });
   })

@@ -1,15 +1,8 @@
 import { useMemo, useState } from "react";
-import { api, getApiBaseUrl } from "../lib/api";
+import { api } from "../lib/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useSeo } from "../lib/seo";
-
-function resolveMediaUrl(url, version = "") {
-  if (!url) return "";
-  if (/^https?:\/\//i.test(url)) return url;
-  const base = getApiBaseUrl();
-  const clean = `${base}${url.startsWith("/") ? "" : "/"}${url}`;
-  return version ? `${clean}?v=${encodeURIComponent(String(version))}` : clean;
-}
+import { AuthImage } from "../components/AuthImage";
 
 export function Dashboard() {
   const { user, refreshMe } = useAuth();
@@ -101,14 +94,12 @@ export function Dashboard() {
                 key={p.url}
                 className="group relative overflow-hidden rounded-2xl bg-white ring-2 ring-rose-100/80 shadow-sm transition hover:ring-rose-200"
               >
-                <a href={resolveMediaUrl(p.url, p.uploadedAt || p.filename || p.url)} target="_blank" rel="noreferrer">
-                  <img
-                    src={resolveMediaUrl(p.url, p.uploadedAt || p.filename || p.url)}
-                    alt={p.filename}
-                    className="h-40 w-full object-cover transition group-hover:scale-[1.02]"
-                    loading="lazy"
-                  />
-                </a>
+                <AuthImage
+                  src={p.url}
+                  version={p.uploadedAt || p.filename || p.url}
+                  alt={p.filename}
+                  className="h-40 w-full object-cover transition group-hover:scale-[1.02]"
+                />
                 <button
                   type="button"
                   className="absolute right-2 top-2 rounded-xl bg-white/90 px-3 py-1 text-xs font-semibold text-rose-700 ring-1 ring-rose-200 backdrop-blur hover:bg-rose-50"

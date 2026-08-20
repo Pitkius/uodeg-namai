@@ -2,24 +2,42 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { z } from "zod";
-import { env } from "../config/env.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/User.js";
 import { badRequest, unauthorized } from "../utils/httpError.js";
-import { signAccessToken } from "../utils/authTokens.js";
-import { requireAuth } from "../middleware/auth.js";
-import { sendPasswordChangedEmail, sendPasswordResetCodeEmail, sendWelcomeEmail } from "../utils/mailer.js";
+import {
+  signAccessToken,
+  setAuthCookie,
+  clearAuthCookie
+} from "../utils/authTokens.js";
+import { requireAuth, isSuperAdminEmail } from "../middleware/auth.js";
+import {
+  sendPasswordChangedEmail,
+  sendPasswordResetCodeEmail,
+  sendWelcomeEmail
+} from "../utils/mailer.js";
+import { passwordSchemaRefine } from "../utils/passwordPolicy.js";
+import {
+  loginLimiter,
+  registerLimiter,
+  resetRequestLimiter,
+  resetConfirmLimiter
+} from "../utils/rateLimits.js";
+import { env } from "../config/env.js";
 
 export const authRouter = express.Router();
 
-const registerSchema = z.object({
-  name: z.string().min(2).max(80),
-  email: z.string().email(),
-  password: z.string().min(8).max(200)
-});
+const registerSchema = z
+  .object({
+    name: z.string().min(2).max(80),
+    email: z.string().email(),
+    password: z.string().min(8).max(200)
+  })
+  .superRefine((data, ctx) => passwordSchemaRefine(data.password, ctx));
 
 authRouter.post(
   "/register",
+  registerLimiter,
   asyncHandler(async (req, res) => {
     const parsed = registerSchema.safeParse(req.body);
     if (!parsed.success) throw badRequest(parsed.error.issues[0]?.message || "Invalid data");
@@ -38,9 +56,17 @@ authRouter.post(
     }
 
     const token = signAccessToken(user);
+    setAuthCookie(res, token);
     res.json({
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, photos: user.photos }
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        photos: user.photos,
+        isSuperAdmin: isSuperAdminEmail(user.email)
+      }
     });
   })
 );
@@ -54,14 +80,17 @@ const requestResetCodeSchema = z.object({
   email: z.string().email()
 });
 
-const confirmResetSchema = z.object({
-  email: z.string().email(),
-  code: z.string().regex(/^\d{6}$/),
-  newPassword: z.string().min(8).max(200)
-});
+const confirmResetSchema = z
+  .object({
+    email: z.string().email(),
+    code: z.string().regex(/^\d{6}$/),
+    newPassword: z.string().min(8).max(200)
+  })
+  .superRefine((data, ctx) => passwordSchemaRefine(data.newPassword, ctx));
 
 authRouter.post(
   "/login",
+  loginLimiter,
   asyncHandler(async (req, res) => {
     const parsed = loginSchema.safeParse(req.body);
     if (!parsed.success) throw badRequest("Invalid email or password");
@@ -74,15 +103,32 @@ authRouter.post(
     if (!ok) throw unauthorized("Invalid email or password");
 
     const token = signAccessToken(user);
+    setAuthCookie(res, token);
     res.json({
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, photos: user.photos }
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        photos: user.photos,
+        isSuperAdmin: isSuperAdminEmail(user.email)
+      }
     });
   })
 );
 
 authRouter.post(
+  "/logout",
+  asyncHandler(async (req, res) => {
+    clearAuthCookie(res);
+    res.json({ ok: true });
+  })
+);
+
+authRouter.post(
   "/reset-password/request-code",
+  resetRequestLimiter,
   asyncHandler(async (req, res) => {
     const parsed = requestResetCodeSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -94,7 +140,7 @@ authRouter.post(
 
     if (!user) return res.json({ ok: true });
 
-    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const code = String(crypto.randomInt(100000, 1000000));
     const codeHash = crypto.createHash("sha256").update(code).digest("hex");
 
     user.resetCodeHash = codeHash;
@@ -109,6 +155,7 @@ authRouter.post(
 
 authRouter.post(
   "/reset-password/confirm",
+  resetConfirmLimiter,
   asyncHandler(async (req, res) => {
     const parsed = confirmResetSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -136,6 +183,7 @@ authRouter.post(
     user.passwordHash = await bcrypt.hash(newPassword, 12);
     user.resetCodeHash = "";
     user.resetCodeExpiresAt = null;
+    user.tokenVersion = (user.tokenVersion || 0) + 1;
     await user.save();
     try {
       await sendPasswordChangedEmail(user.email, user.name);
@@ -144,6 +192,7 @@ authRouter.post(
       console.error("Password changed email failed:", e?.message || e);
     }
 
+    clearAuthCookie(res);
     return res.json({ ok: true });
   })
 );
@@ -158,9 +207,9 @@ authRouter.get(
         name: req.user.name,
         email: req.user.email,
         role: req.user.role,
-        photos: req.user.photos
+        photos: req.user.photos,
+        isSuperAdmin: isSuperAdminEmail(req.user.email)
       }
     });
   })
 );
-

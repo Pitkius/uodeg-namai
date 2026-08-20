@@ -23,23 +23,24 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   async function refreshMe(nextToken = token) {
-    if (!nextToken) return;
     try {
       const res = await api.get("/api/auth/me", {
-        headers: { Authorization: `Bearer ${nextToken}` }
+        headers: nextToken ? { Authorization: `Bearer ${nextToken}` } : undefined
       });
       setUser(res.data.user);
       setStoredUser(res.data.user);
+      return true;
     } catch {
       setToken("");
       setUser(null);
       setStoredToken("");
       setStoredUser(null);
+      return false;
     }
   }
 
   useEffect(() => {
-    if (token && !user) refreshMe(token);
+    refreshMe(token);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -112,7 +113,12 @@ export function AuthProvider({ children }) {
     }
   }
 
-  function logout() {
+  async function logout() {
+    try {
+      await api.post("/api/auth/logout");
+    } catch {
+      // ignore
+    }
     setStoredToken("");
     setStoredUser(null);
     setToken("");
@@ -124,8 +130,9 @@ export function AuthProvider({ children }) {
       token,
       user,
       loading,
-      isAuthed: Boolean(token),
+      isAuthed: Boolean(token) || Boolean(user),
       isAdmin: user?.role === "admin",
+      isSuperAdmin: Boolean(user?.isSuperAdmin),
       login,
       register,
       requestResetCode,
@@ -144,4 +151,3 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }
-
