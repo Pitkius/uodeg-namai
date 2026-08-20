@@ -471,7 +471,7 @@ export function Home() {
                     <circle cx="12" cy="10" r="2.2" stroke="currentColor" strokeWidth="1.5" />
                   </svg>
                 </span>
-                Lietuva · Sunny Yard kiemas
+                Sodų 10
               </p>
             </div>
             <div className="mt-7 overflow-hidden rounded-[1.75rem] shadow-card ring-1 ring-sand-200">
