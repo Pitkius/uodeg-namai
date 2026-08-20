@@ -18,6 +18,7 @@ import { reservationsRouter } from "./routes/reservations.js";
 import { uploadsRouter } from "./routes/uploads.js";
 import { contactRouter } from "./routes/contact.js";
 import { chatRouter } from "./routes/chat.js";
+import { analyticsRouter } from "./routes/analytics.js";
 import { apiLimiter } from "./utils/rateLimits.js";
 
 async function bootstrap() {
@@ -74,6 +75,15 @@ async function bootstrap() {
     console.error("Chat indexes sync failed:", e?.message || e);
   }
 
+  try {
+    const { DailyTraffic, VisitorDay } = await import("./models/Analytics.js");
+    await DailyTraffic.syncIndexes();
+    await VisitorDay.syncIndexes();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("Analytics indexes sync failed:", e?.message || e);
+  }
+
   const app = express();
   // Behind Hostinger / reverse proxy so rate-limit can read X-Forwarded-For safely
   app.set("trust proxy", 1);
@@ -112,6 +122,7 @@ async function bootstrap() {
   app.use("/api/uploads", uploadsRouter);
   app.use("/api/contact", contactRouter);
   app.use("/api/chat", chatRouter);
+  app.use("/api/analytics", analyticsRouter);
 
   app.use(errorHandler);
 

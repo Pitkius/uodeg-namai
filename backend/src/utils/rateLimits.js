@@ -62,3 +62,11 @@ export const chatStartLimiter = rateLimit({
   legacyHeaders: false,
   message: { message: "Per daug naujų pokalbių. Palaukite ir bandykite vėliau." }
 });
+
+export const visitLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Per daug uzklausu." }
+});

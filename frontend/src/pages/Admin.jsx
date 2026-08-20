@@ -9,6 +9,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useSeo } from "../lib/seo";
 import { AuthImage } from "../components/AuthImage";
 import { AdminChatPanel } from "../components/AdminChatPanel";
+import { AdminAnalyticsPanel } from "../components/AdminAnalyticsPanel";
 
 function iso(d) {
   return new Date(d).toISOString();
@@ -95,9 +96,9 @@ export function Admin() {
         : "Laisvas apsistojimo laikas";
       const className = r
         ? r.status === "confirmed"
-          ? "bg-slate-900 border-slate-900"
-          : "bg-amber-600 border-amber-600"
-        : "bg-emerald-600 border-emerald-600";
+          ? "bg-navy-800 border-navy-800"
+          : "bg-tan-400 border-tan-400"
+        : "bg-skyyard-500 border-skyyard-500";
       return {
         id: String(s._id),
         title,
@@ -120,8 +121,8 @@ export function Admin() {
         allDay: true,
         className:
           r.status === "confirmed"
-            ? "bg-slate-900 border-slate-900"
-            : "bg-amber-600 border-amber-600",
+            ? "bg-navy-800 border-navy-800"
+            : "bg-tan-400 border-tan-400",
         extendedProps: { slot: null, reservation: r }
       });
     }
@@ -231,18 +232,19 @@ export function Admin() {
 
   return (
     <div className="grid gap-6">
-      <div className="card overflow-hidden border-0 bg-gradient-to-br from-slate-900/5 via-sky-50/50 to-rose-50/40 p-6 text-left ring-1 ring-sky-100/80">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              <span className="page-title">Admin: pilnas valdymas</span>
+      <div className="card relative overflow-hidden p-4 text-left sm:p-6 md:p-8">
+        <div className="pointer-events-none absolute -right-8 -top-8 hidden h-36 w-36 rounded-full bg-skyyard-100/70 sm:block" />
+        <div className="relative flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-skyyard-500">Sunny Yard</p>
+            <h1 className="page-title mt-1 text-2xl font-semibold sm:text-3xl md:text-4xl">
+              Labas{user?.name ? `, ${String(user.name).split(" ")[0]}` : ", Admin"}!
             </h1>
-            <p className="mt-1 text-sm text-slate-600">
-              Matomas pilnas kalendorius, visos pastabos ir savininkų įkeltos augintinio nuotraukos.
-              Prisijungęs kaip {user?.name}.
+            <p className="mt-2 text-sm text-navy-800/65">
+              Kas vyksta Uodegų namuose šiandien — kalendorius, rezervacijos, žinutės ir statistika.
             </p>
           </div>
-          <button className="btn-ghost" onClick={load} disabled={loading}>
+          <button className="btn-ghost w-full sm:w-auto" onClick={load} disabled={loading}>
             {loading ? "Kraunama..." : "Atnaujinti"}
           </button>
         </div>
@@ -255,6 +257,13 @@ export function Admin() {
         ) : null}
       </div>
 
+      <AdminAnalyticsPanel
+        onError={(msg) => {
+          setError(msg);
+          setSuccess("");
+        }}
+      />
+
       <AdminChatPanel
         onError={(msg) => {
           setError(msg);
@@ -266,10 +275,10 @@ export function Admin() {
         }}
       />
 
-      <div className="card overflow-hidden border-0 bg-gradient-to-br from-slate-900/5 via-sky-50/50 to-rose-50/40 p-6 text-left ring-1 ring-sky-100/80">
+      <div className="card p-6 text-left">
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-sky-200/60 bg-gradient-to-br from-sky-100/80 to-violet-50/60 p-4 md:col-span-1">
-            <div className="text-sm font-semibold text-slate-900">Pridėti apsistojimo slotą</div>
+          <div className="rounded-2xl border border-sand-200 bg-sand-50 p-4 md:col-span-1">
+            <div className="text-sm font-semibold text-navy-900">Pridėti apsistojimo slotą</div>
             <div className="mt-3 grid gap-3">
               <div>
                 <div className="label">Pradžia</div>
@@ -295,7 +304,7 @@ export function Admin() {
             </div>
           </div>
 
-          <div className="md:col-span-2 overflow-hidden rounded-2xl border border-slate-200/60 bg-white/80 p-2 shadow-inner">
+          <div className="md:col-span-2 min-w-0 overflow-x-auto overflow-y-hidden rounded-2xl border border-sand-200 bg-white p-2 shadow-inner">
             <FullCalendar
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
               locale={ltLocale}
@@ -328,8 +337,8 @@ export function Admin() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <div className="card border-0 bg-gradient-to-br from-indigo-50/70 to-sky-50/40 p-6 text-left ring-1 ring-indigo-100/60">
-          <h2 className="text-lg font-bold text-slate-900">Admin vartotojai</h2>
+        <div className="card p-6 text-left">
+          <h2 className="font-display text-xl font-semibold text-navy-800">Admin vartotojai</h2>
           {isSuperAdmin ? (
             <form className="mt-3 grid gap-3" onSubmit={createAdmin}>
               <div>
@@ -367,7 +376,7 @@ export function Admin() {
               </button>
             </form>
           ) : (
-            <div className="mt-3 rounded-xl bg-white/80 p-3 text-sm text-slate-700 ring-1 ring-indigo-100">
+            <div className="mt-3 rounded-xl bg-white/80 p-3 text-sm text-navy-800 ring-1 ring-sand-200">
               Tik pagrindinis adminas gali pridėti arba ištrinti adminus.
             </div>
           )}
@@ -376,11 +385,11 @@ export function Admin() {
             {admins.map((a) => (
               <div
                 key={a._id}
-                className="flex items-center justify-between gap-3 rounded-xl bg-white/90 p-3 ring-1 ring-indigo-100"
+                className="flex items-center justify-between gap-3 rounded-xl bg-white/90 p-3 ring-1 ring-sand-200"
               >
                 <div>
-                  <div className="text-sm font-semibold text-slate-900">{a.name}</div>
-                  <div className="text-xs text-slate-600">{a.email}</div>
+                  <div className="text-sm font-semibold text-navy-900">{a.name}</div>
+                  <div className="text-xs text-navy-800/70">{a.email}</div>
                 </div>
                 {isSuperAdmin && String(a._id) !== String(user?.id) ? (
                   <button className="btn-ghost" onClick={() => removeAdmin(a._id)}>
@@ -392,11 +401,11 @@ export function Admin() {
           </div>
         </div>
 
-        <div className="card border-0 bg-gradient-to-br from-emerald-50/70 to-cyan-50/40 p-6 text-left ring-1 ring-emerald-100/60">
-          <h2 className="text-lg font-bold text-slate-900">Apsistojimo slotai</h2>
+        <div className="card p-6 text-left">
+          <h2 className="font-display text-xl font-semibold text-navy-800">Apsistojimo slotai</h2>
           <div className="mt-3 grid gap-2">
             {slots.length === 0 ? (
-              <div className="rounded-xl border border-emerald-200/50 bg-emerald-50/50 p-4 text-sm text-slate-600">
+              <div className="rounded-xl border border-sand-200 bg-sand-50 p-4 text-sm text-navy-800/70">
                 Nėra apsistojimo slotų šiame intervale.
               </div>
             ) : (
@@ -406,13 +415,13 @@ export function Admin() {
                 .map((s) => (
                   <div
                     key={s._id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/80 bg-white/90 p-4 shadow-sm ring-1 ring-emerald-100/50"
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/80 bg-white/90 p-4 shadow-sm ring-1 ring-sand-200"
                   >
                     <div>
-                      <div className="text-sm font-medium text-slate-900">
+                      <div className="text-sm font-medium text-navy-900">
                         {new Date(s.start).toLocaleString("lt-LT")}
                       </div>
-                      <div className="text-xs text-slate-600">
+                      <div className="text-xs text-navy-800/70">
                         Trukmė: {Math.round((new Date(s.end) - new Date(s.start)) / (60 * 1000))} min.
                       </div>
                     </div>
@@ -426,25 +435,25 @@ export function Admin() {
         </div>
       </div>
 
-      <div className="card border-0 bg-gradient-to-br from-sky-50/80 to-indigo-50/50 p-6 text-left ring-1 ring-sky-100/60">
-        <h2 className="text-lg font-bold text-slate-900">Kontaktų formos žinutės</h2>
+      <div className="card p-6 text-left">
+        <h2 className="font-display text-xl font-semibold text-navy-800">Kontaktų formos žinutės</h2>
         <div className="mt-3 grid gap-3">
           {contactMessages.length === 0 ? (
-            <div className="rounded-xl border border-sky-200/60 bg-white/80 p-4 text-sm text-slate-600">
+            <div className="rounded-xl border border-sand-200 bg-sand-50 p-4 text-sm text-navy-800/70">
               Kol kas nėra gautų žinučių.
             </div>
           ) : (
             contactMessages.map((m) => (
               <div
                 key={m._id}
-                className="rounded-xl border border-white/80 bg-white/95 p-4 shadow-sm ring-1 ring-sky-100/50"
+                className="rounded-xl border border-white/80 bg-white/95 p-4 shadow-sm ring-1 ring-sand-200"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <div className="text-sm font-semibold text-slate-900">{m.name}</div>
-                    <div className="text-xs text-slate-600">{m.email}</div>
-                    <div className="text-xs text-slate-600">Tel.: {m.phone || "-"}</div>
-                    <div className="mt-1 text-xs text-slate-500">
+                    <div className="text-sm font-semibold text-navy-900">{m.name}</div>
+                    <div className="text-xs text-navy-800/70">{m.email}</div>
+                    <div className="text-xs text-navy-800/70">Tel.: {m.phone || "-"}</div>
+                    <div className="mt-1 text-xs text-navy-800/50">
                       Gauta: {new Date(m.createdAt).toLocaleString("lt-LT")}
                     </div>
                   </div>
@@ -452,7 +461,7 @@ export function Admin() {
                     <span
                       className={[
                         "rounded-lg px-2 py-1 text-xs font-semibold",
-                        m.isRead ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-900"
+                        m.isRead ? "bg-skyyard-100 text-navy-800" : "bg-tan-200 text-navy-900"
                       ].join(" ")}
                     >
                       {m.isRead ? "Perskaityta" : "Nauja"}
@@ -464,7 +473,7 @@ export function Admin() {
                     ) : null}
                   </div>
                 </div>
-                <div className="mt-3 rounded-xl bg-slate-50 p-3 text-sm text-slate-700 ring-1 ring-slate-200">
+                <div className="mt-3 rounded-xl bg-sand-50 p-3 text-sm text-navy-800 ring-1 ring-sand-200">
                   {m.message}
                 </div>
               </div>
@@ -473,11 +482,11 @@ export function Admin() {
         </div>
       </div>
 
-      <div className="card border-0 bg-gradient-to-br from-rose-50/80 to-orange-50/50 p-6 text-left ring-1 ring-rose-100/60">
-        <h2 className="text-lg font-bold text-slate-900">Visos apsistojimo užklausos (su pastabomis ir foto)</h2>
+      <div className="card p-6 text-left">
+        <h2 className="font-display text-xl font-semibold text-navy-800">Visos apsistojimo užklausos (su pastabomis ir foto)</h2>
         <div className="mt-3 grid gap-3">
           {reservations.length === 0 ? (
-            <div className="rounded-xl border border-rose-200/50 bg-rose-50/50 p-4 text-sm text-slate-600">
+            <div className="rounded-xl border border-sand-200 bg-sand-50 p-4 text-sm text-navy-800/70">
               Nėra apsistojimo užklausų šiame intervale.
             </div>
           ) : (
@@ -487,19 +496,19 @@ export function Admin() {
               .map((r) => (
                 <div
                   key={r._id}
-                  className="rounded-xl border border-white/80 bg-white/95 p-4 shadow-sm ring-1 ring-rose-100/50"
+                  className="rounded-xl border border-white/80 bg-white/95 p-4 shadow-sm ring-1 ring-sand-200"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <div className="text-sm font-semibold text-slate-900">{r.ownerName || r.userName}</div>
-                      <div className="text-xs text-slate-600">{r.ownerEmail || "be el. pašto"}</div>
-                      <div className="mt-1 text-xs text-slate-600">
+                      <div className="text-sm font-semibold text-navy-900">{r.ownerName || r.userName}</div>
+                      <div className="text-xs text-navy-800/70">{r.ownerEmail || "be el. pašto"}</div>
+                      <div className="mt-1 text-xs text-navy-800/70">
                         {new Date(r.start).toLocaleDateString("lt-LT")} -{" "}
                         {new Date(r.end).toLocaleDateString("lt-LT")} (išvykimas)
                       </div>
-                      <div className="mt-1 text-xs text-slate-600">
+                      <div className="mt-1 text-xs text-navy-800/70">
                         Statusas:{" "}
-                        <span className="font-medium text-slate-900">
+                        <span className="font-medium text-navy-900">
                           {r.status === "pending"
                             ? "laukiama"
                             : r.status === "confirmed"
@@ -507,18 +516,18 @@ export function Admin() {
                               : "atšaukta"}
                         </span>
                       </div>
-                      <div className="mt-2 text-xs text-slate-700">
-                        Pastabos: <span className="text-slate-600">{r.notes || "-"}</span>
+                      <div className="mt-2 text-xs text-navy-800">
+                        Pastabos: <span className="text-navy-800/70">{r.notes || "-"}</span>
                       </div>
 
                       <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                         {(r.ownerPhotos || []).length === 0 ? (
-                          <div className="rounded-lg bg-slate-100 p-2 text-xs text-slate-500">Nuotraukų nėra</div>
+                          <div className="rounded-lg bg-sand-100 p-2 text-xs text-navy-800/50">Nuotraukų nėra</div>
                         ) : (
                           (r.ownerPhotos || []).slice(0, 8).map((p) => (
                             <div
                               key={`${r._id}-${p.url}`}
-                              className="overflow-hidden rounded-lg ring-1 ring-slate-200"
+                              className="overflow-hidden rounded-lg ring-1 ring-sand-200"
                             >
                               <AuthImage
                                 src={p.url}

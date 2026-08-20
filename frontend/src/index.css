@@ -8,55 +8,432 @@
     height: 100%;
   }
   body {
-    @apply min-h-screen bg-gradient-to-br from-amber-50 via-sky-50 to-rose-50 text-slate-900 antialiased;
+    @apply min-h-screen bg-sand-50 font-sans text-navy-900 antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: "Fraunces", Georgia, serif;
   }
 }
 
 @layer components {
   .card {
-    @apply rounded-2xl border border-white/60 bg-white/85 shadow-soft backdrop-blur-sm;
+    @apply rounded-[1.25rem] border border-sand-200/80 bg-white shadow-card;
   }
   .btn {
     @apply inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition duration-200;
   }
   .btn-primary {
-    @apply btn bg-gradient-to-r from-rose-500 via-orange-500 to-amber-500 text-white shadow-md shadow-rose-300/40 hover:brightness-105 active:scale-[0.98];
+    @apply btn rounded-xl bg-navy-800 text-white shadow-[0_8px_20px_-10px_rgba(26,43,86,0.45)] hover:bg-navy-700 active:scale-[0.98];
   }
   .btn-ghost {
-    @apply btn border border-sky-200/80 bg-white/90 text-slate-800 shadow-sm hover:border-rose-200 hover:bg-rose-50/80;
+    @apply btn rounded-xl border border-sand-300 bg-white text-navy-800 hover:bg-sand-100;
+  }
+  .btn-sky {
+    @apply btn rounded-xl bg-skyyard-500 text-white shadow-[0_8px_20px_-10px_rgba(74,144,194,0.45)] hover:brightness-105 active:scale-[0.98];
   }
   .input {
-    @apply w-full rounded-xl border border-sky-200/80 bg-white/90 px-3 py-2.5 text-sm outline-none transition focus:border-rose-300 focus:ring-2 focus:ring-rose-200;
+    @apply w-full rounded-xl border border-sand-300 bg-white px-3.5 py-2.5 text-sm text-navy-900 outline-none transition placeholder:text-navy-800/40 focus:border-skyyard-500 focus:ring-2 focus:ring-skyyard-200;
   }
   .label {
-    @apply text-sm font-medium text-slate-700;
+    @apply text-sm font-medium text-navy-800;
   }
   .error {
-    @apply text-sm text-rose-600;
+    @apply text-sm text-red-700;
   }
   .page-title {
-    @apply bg-gradient-to-r from-rose-600 via-orange-500 to-amber-500 bg-clip-text text-transparent;
+    @apply font-display text-navy-800;
+  }
+  .section-title {
+    @apply font-display text-[1.65rem] font-semibold leading-tight text-navy-800 sm:text-2xl md:text-3xl;
   }
 }
 
-/* FullCalendar — derinimas su svetainės spalvomis */
+/* FullCalendar — C Sunny Yard (reservations) */
+.sunny-calendar .fc {
+  --fc-border-color: #eef2f6;
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: transparent;
+  --fc-today-bg-color: transparent;
+  --fc-event-border-color: transparent;
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+
+.sunny-calendar .fc .fc-toolbar {
+  margin-bottom: 1.25rem !important;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.sunny-calendar .fc .fc-toolbar-title {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.4rem !important;
+  font-weight: 600;
+  color: #1a2b56;
+  letter-spacing: -0.02em;
+}
+
+.sunny-calendar .fc .fc-button-primary {
+  border: 1px solid #e4ebf2 !important;
+  background: #fff !important;
+  color: #1a2b56 !important;
+  font-weight: 600;
+  border-radius: 0.85rem !important;
+  box-shadow: 0 1px 2px rgba(26, 43, 86, 0.04);
+  padding: 0.48rem 0.9rem !important;
+  text-transform: none !important;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sunny-calendar .fc .fc-button-primary:disabled {
+  opacity: 0.4;
+}
+
+.sunny-calendar .fc .fc-button-primary:not(:disabled):hover {
+  background: #f3f8fc !important;
+  border-color: #c5dff0 !important;
+  box-shadow: 0 4px 12px -6px rgba(74, 144, 194, 0.35);
+}
+
+.sunny-calendar .fc .fc-button-primary:focus {
+  box-shadow: 0 0 0 3px rgba(74, 144, 194, 0.28) !important;
+}
+
+.sunny-calendar .fc .fc-button-group {
+  overflow: hidden;
+  border-radius: 0.85rem;
+  box-shadow: 0 1px 2px rgba(26, 43, 86, 0.04);
+}
+
+.sunny-calendar .fc .fc-button-group .fc-button {
+  border-radius: 0 !important;
+  margin: 0 !important;
+  border-right-width: 0 !important;
+}
+
+.sunny-calendar .fc .fc-button-group .fc-button:last-child {
+  border-right-width: 1px !important;
+}
+
+.sunny-calendar .fc .fc-button-group .fc-button:first-child {
+  border-radius: 0.85rem 0 0 0.85rem !important;
+}
+
+.sunny-calendar .fc .fc-button-group .fc-button:last-child {
+  border-radius: 0 0.85rem 0.85rem 0 !important;
+}
+
+.sunny-calendar .fc .fc-today-button {
+  background: #4a90c2 !important;
+  border-color: #4a90c2 !important;
+  color: #fff !important;
+  border-radius: 0.85rem !important;
+  box-shadow: 0 6px 16px -8px rgba(74, 144, 194, 0.7);
+}
+
+.sunny-calendar .fc .fc-today-button:hover {
+  filter: brightness(1.06);
+}
+
+.sunny-calendar .fc .fc-col-header-cell {
+  background: transparent;
+  border: none !important;
+  padding: 0.4rem 0 0.65rem !important;
+}
+
+.sunny-calendar .fc .fc-col-header-cell-cushion {
+  color: #7a879c;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.25rem !important;
+}
+
+.sunny-calendar .fc-theme-standard td,
+.sunny-calendar .fc-theme-standard th,
+.sunny-calendar .fc-theme-standard .fc-scrollgrid,
+.sunny-calendar .fc-theme-standard .fc-scrollgrid-section > td {
+  border-color: #f1f4f8 !important;
+}
+
+.sunny-calendar .fc-theme-standard .fc-scrollgrid {
+  border-radius: 1.15rem;
+  overflow: hidden;
+  border: 1px solid #e8eef5 !important;
+  background: linear-gradient(180deg, #fafcfe 0%, #ffffff 40%);
+}
+
+.sunny-calendar .fc .fc-daygrid-body {
+  width: 100% !important;
+}
+
+.sunny-calendar .fc .fc-daygrid-day-frame {
+  min-height: 6.1rem;
+  padding: 0.2rem 0.05rem 0.4rem;
+}
+
+.sunny-calendar .fc .fc-daygrid-day-top {
+  display: flex;
+  justify-content: flex-start;
+  padding: 0.25rem 0.35rem 0.15rem;
+}
+
+.sunny-calendar .fc .fc-daygrid-day-number {
+  float: none !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  margin: 0;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #243b6b;
+  text-decoration: none !important;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.sunny-calendar .fc .fc-daygrid-day.fc-day-today {
+  background: rgba(74, 144, 194, 0.04) !important;
+}
+
+.sunny-calendar .fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+  background: #4a90c2;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px -4px rgba(74, 144, 194, 0.75);
+  transform: scale(1.05);
+}
+
+.sunny-calendar .fc .fc-daygrid-day.fc-day-other {
+  background: rgba(248, 250, 252, 0.65);
+}
+
+.sunny-calendar .fc .fc-daygrid-day.fc-day-other .fc-daygrid-day-number {
+  color: #c0c8d4;
+}
+
+.sunny-calendar .fc .fc-daygrid-day:hover {
+  background: rgba(227, 240, 249, 0.45);
+  cursor: pointer;
+}
+
+.sunny-calendar .fc .fc-daygrid-day.fc-day-today:hover {
+  background: rgba(74, 144, 194, 0.07) !important;
+}
+
+/* Soft pastel pills — mockup style */
+.sunny-calendar .fc .fc-daygrid-event-harness {
+  margin-top: 0.2rem !important;
+}
+
+.sunny-calendar .fc .fc-daygrid-event {
+  border: 0 !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 1.7rem !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.sunny-calendar .fc .fc-daygrid-event .fc-event-main {
+  padding: 0 !important;
+  height: 100%;
+}
+
+.sunny-calendar .fc .fc-daygrid-event .fc-event-main-frame {
+  height: 100%;
+}
+
+.sunny-calendar .fc .fc-stay-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 1.7rem;
+  min-height: 1.7rem;
+  padding: 0 0.7rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  color: #1a2b56;
+  transition: filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sunny-calendar .fc .fc-stay-paw {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #1a2b56;
+  box-shadow: 0 1px 2px rgba(26, 43, 86, 0.06);
+}
+
+.sunny-calendar .fc .fc-stay-paw svg {
+  display: block;
+}
+
+.sunny-calendar .fc .fc-stay-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #1a2b56;
+  font-weight: 600;
+}
+
+.sunny-calendar .fc .fc-stay-continue {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Continuous multi-day + week wrap */
+.sunny-calendar .fc .fc-daygrid-event.fc-event-start .fc-stay-inner {
+  margin-left: 0.32rem;
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+  padding-left: 0.4rem;
+}
+
+.sunny-calendar .fc .fc-daygrid-event.fc-event-end .fc-stay-inner {
+  margin-right: 0.32rem;
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+  padding-right: 0.7rem;
+}
+
+.sunny-calendar .fc .fc-daygrid-event:not(.fc-event-start) .fc-stay-inner {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: 0;
+  padding-left: 0.2rem;
+}
+
+.sunny-calendar .fc .fc-daygrid-event:not(.fc-event-end) .fc-stay-inner {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-right: 0;
+  padding-right: 0.2rem;
+}
+
+.sunny-calendar .fc .fc-daygrid-event.fc-event-start.fc-event-end .fc-stay-inner {
+  margin-left: 0.32rem;
+  margin-right: 0.32rem;
+  border-radius: 999px;
+  padding-left: 0.4rem;
+  padding-right: 0.7rem;
+}
+
+/* Pastel sky / peach */
+.sunny-calendar .fc .fc-stay-confirmed .fc-stay-inner {
+  background: linear-gradient(180deg, #e7f3fb 0%, #d5eaf7 100%);
+  color: #1a2b56;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 2px 6px -3px rgba(74, 144, 194, 0.35);
+}
+
+.sunny-calendar .fc .fc-stay-pending .fc-stay-inner {
+  background: linear-gradient(180deg, #f8ede1 0%, #f0dfc8 100%);
+  color: #1a2b56;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 2px 6px -3px rgba(196, 168, 130, 0.35);
+}
+
+.sunny-calendar .fc .fc-daygrid-more-link {
+  color: #4a90c2;
+  font-weight: 700;
+  font-size: 0.7rem;
+  margin: 0.15rem 0.35rem;
+}
+
+#reservations-calendar .fc-event {
+  pointer-events: none !important;
+}
+
+@media (max-width: 640px) {
+  .sunny-calendar .fc .fc-toolbar {
+    margin-bottom: 0.75rem !important;
+    gap: 0.4rem;
+  }
+
+  .sunny-calendar .fc .fc-toolbar-title {
+    font-size: 1.05rem !important;
+    width: 100%;
+    text-align: center;
+    order: -1;
+  }
+
+  .sunny-calendar .fc .fc-toolbar-chunk {
+    display: flex;
+    justify-content: center;
+  }
+
+  .sunny-calendar .fc .fc-button-primary {
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 0.65rem !important;
+  }
+
+  .sunny-calendar .fc .fc-daygrid-day-frame {
+    min-height: 4.25rem;
+  }
+
+  .sunny-calendar .fc .fc-daygrid-day-number {
+    width: 1.35rem;
+    height: 1.35rem;
+    font-size: 0.7rem;
+  }
+
+  .sunny-calendar .fc .fc-stay-inner {
+    height: 1.35rem;
+    min-height: 1.35rem;
+    font-size: 0.62rem;
+    gap: 0.2rem;
+  }
+
+  .sunny-calendar .fc .fc-stay-paw {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .sunny-calendar .fc .fc-col-header-cell-cushion {
+    font-size: 0.58rem;
+    letter-spacing: 0.04em;
+  }
+}
+
+@media (max-width: 380px) {
+  .sunny-calendar .fc .fc-stay-label {
+    max-width: 3.2rem;
+  }
+}
+
+/* Admin / global FC fallbacks */
 .fc .fc-button-primary {
-  @apply rounded-lg border-0 bg-gradient-to-r from-rose-500 to-orange-500 font-semibold text-white shadow-sm;
+  @apply rounded-lg border-0 bg-navy-800 font-semibold text-white shadow-sm;
 }
 .fc .fc-button-primary:disabled {
   @apply opacity-50;
 }
 .fc .fc-button-primary:not(:disabled):hover {
-  @apply brightness-105;
+  @apply bg-navy-700;
 }
-/* FullCalendar perjungimo mygtukai (Mėnuo / Savaitė) — kad tekstas būtų baltas ir aktyvus */ 
 .fc .fc-button-primary.fc-button-active,
 .fc .fc-button-primary:active {
-  @apply text-white;
-  filter: brightness(0.98);
+  @apply bg-navy-900 text-white;
 }
-
-/* Mygtukų grupė — kaip vienas pill (be tarpų) */
 .fc .fc-button-group {
   @apply overflow-hidden rounded-lg;
 }
@@ -71,11 +448,16 @@
   @apply rounded-r-lg;
 }
 .fc .fc-today-button {
-  @apply rounded-lg border-0 bg-gradient-to-r from-rose-500 to-orange-500 font-semibold text-white shadow-sm;
-  background-image: linear-gradient(to right, rgb(244 63 94), rgb(249 115 22)) !important;
+  @apply rounded-lg border-0 bg-skyyard-500 font-semibold text-white shadow-sm !important;
 }
-
-/* Rezervacijų kalendorius: visi įvykiai (įskaitant „Užimta“ foną) kitaip gali blokuoti dateClick */
-#reservations-calendar .fc-event {
-  pointer-events: none !important;
+.fc .fc-daygrid-day.fc-day-today {
+  background: rgb(227 240 249 / 0.7) !important;
+}
+.fc .fc-col-header-cell {
+  @apply bg-sand-50 text-navy-800;
+}
+.fc-theme-standard td,
+.fc-theme-standard th,
+.fc-theme-standard .fc-scrollgrid {
+  border-color: #e8dfd0 !important;
 }

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Uodegų namai">
+  <!-- Rounded tile like the classic mark -->
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="#FFFFFF" stroke="#132144" stroke-width="1.75"/>
+  <!-- House face: roof + walls + door arch -->
+  <path
+    d="M17.5 34.2 32 19.2 46.5 34.2V49H38.4c0-1.2-.1-6.8-6.4-6.8S25.6 47.8 25.6 49H17.5V34.2Z"
+    stroke="#1A2B56"
+    stroke-width="2.75"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+  <!-- Eyes -->
+  <circle cx="26" cy="34.8" r="2.15" fill="#1A2B56"/>
+  <circle cx="38" cy="34.8" r="2.15" fill="#1A2B56"/>
+</svg>

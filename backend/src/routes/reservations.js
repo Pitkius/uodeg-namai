@@ -161,8 +161,16 @@ reservationsRouter.post(
 
     const start = parseYmd(parsed.data.checkIn);
     const end = parseYmd(parsed.data.checkOut);
-    if (!start || !end) throw badRequest("Invalid dates");
-    if (end <= start) throw badRequest("Check-out must be after check-in");
+    if (!start || !end) throw badRequest("Neteisingos datos");
+    if (end <= start) {
+      throw badRequest("Išvykimo data turi būti vėlesnė už atvykimo datą");
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (start < today) {
+      throw badRequest("Atvykimas negali būti praeityje");
+    }
 
     // Viena vieta vienu metu: bet koks persidengimas su aktyvia rezervacija neleidžiamas.
     const overlap = await hasOverlap(start, end);

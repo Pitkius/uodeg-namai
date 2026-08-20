@@ -37,10 +37,10 @@ export function AuthImage({ src, alt, className, version }) {
   }, [src, version]);
 
   if (failed) {
-    return <div className={className || "bg-slate-100 text-xs text-slate-500"}>Nuotrauka nepasiekiama</div>;
+    return <div className={className || "bg-sand-100 text-xs text-navy-800/50"}>Nuotrauka nepasiekiama</div>;
   }
   if (!blobUrl) {
-    return <div className={className || "animate-pulse bg-slate-100"} aria-hidden />;
+    return <div className={className || "animate-pulse bg-sand-200"} aria-hidden />;
   }
   return <img src={blobUrl} alt={alt || ""} className={className} loading="lazy" />;
 }
