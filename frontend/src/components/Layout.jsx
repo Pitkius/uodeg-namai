@@ -74,6 +74,9 @@ export function Layout() {
       <NavItem hash="#duk" onClick={closeMenu}>
         DUK
       </NavItem>
+      <NavItem to="/galerija" onClick={closeMenu}>
+        Galerija
+      </NavItem>
       <NavItem hash="#kontaktai" onClick={closeMenu}>
         Kontaktai
       </NavItem>
@@ -260,7 +263,7 @@ export function Layout() {
               </div>
             </div>
             <p className="mt-3 max-w-md text-sm text-sand-200/85">
-              Kai išvykstate — jiems kaip namie. Šilta nakvynė, žaidimai ir rami komunikacija.
+              Kai išvykstate — jiems kaip namie. Gyvūnų viešbutis Mažeikiuose, Sodų 10.
             </p>
           </div>
           <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
@@ -268,7 +271,13 @@ export function Layout() {
               <a className="hover:text-white" href="tel:+37062033487">
                 +370 620 33487
               </a>
-              <div className="mt-1">{new Date().getFullYear()} • Visos teisės saugomos</div>
+              <div className="mt-1">
+                <Link className="hover:text-white" to="/galerija">
+                  Galerija
+                </Link>
+                {" · "}
+                {new Date().getFullYear()} • Visos teisės saugomos
+              </div>
             </div>
             <Link
               to={datesHref}

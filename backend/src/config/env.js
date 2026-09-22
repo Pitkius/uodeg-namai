@@ -25,6 +25,7 @@ export const env = {
   // Raw upload cap before sharp resize (then saved much smaller as JPEG)
   maxUploadMb: process.env.MAX_UPLOAD_MB ? Number(process.env.MAX_UPLOAD_MB) : 20,
   maxUserPhotos: process.env.MAX_USER_PHOTOS ? Number(process.env.MAX_USER_PHOTOS) : 10,
+  maxGalleryPhotos: process.env.MAX_GALLERY_PHOTOS ? Number(process.env.MAX_GALLERY_PHOTOS) : 60,
   /** Override with SUPER_ADMIN_EMAIL in production */
   superAdminEmail: (process.env.SUPER_ADMIN_EMAIL || "pytka4101@gmail.com").toLowerCase().trim(),
   smtpHost: process.env.SMTP_HOST || "",

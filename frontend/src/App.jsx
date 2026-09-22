@@ -7,6 +7,7 @@ import { Register } from "./pages/Register";
 import { Dashboard } from "./pages/Dashboard";
 import { Reservations } from "./pages/Reservations";
 import { Admin } from "./pages/Admin";
+import { Gallery } from "./pages/Gallery";
 import { NotFound } from "./pages/NotFound";
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/galerija" element={<Gallery />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 

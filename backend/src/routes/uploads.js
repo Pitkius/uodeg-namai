@@ -4,11 +4,11 @@ import { fileURLToPath } from "url";
 import fs from "fs/promises";
 import crypto from "crypto";
 import multer from "multer";
-import sharp from "sharp";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { requireAuth } from "../middleware/auth.js";
 import { env } from "../config/env.js";
 import { User } from "../models/User.js";
+import { optimizePhotoFile } from "../utils/optimizePhoto.js";
 import { badRequest, forbidden, notFound } from "../utils/httpError.js";
 
 export const uploadsRouter = express.Router();
@@ -40,39 +40,6 @@ const upload = multer({
     cb(null, true);
   }
 });
-
-/** Resize + JPEG compress; throws if file is not a real image. */
-async function optimizePhotoFile(inputPath) {
-  const meta = await sharp(inputPath).metadata();
-  if (!meta.format || meta.format === "svg") {
-    throw new Error("Unsupported or invalid image");
-  }
-
-  const dir = path.dirname(inputPath);
-  const finalFilename = `${path.basename(inputPath, path.extname(inputPath))}.jpg`;
-  const finalPath = path.join(dir, finalFilename);
-  const tmpPath = path.join(dir, `.opt-${Date.now()}-${crypto.randomBytes(4).toString("hex")}.jpg`);
-
-  await sharp(inputPath)
-    .rotate()
-    .resize({
-      width: 1920,
-      height: 1920,
-      fit: "inside",
-      withoutEnlargement: true
-    })
-    .jpeg({ quality: 82, mozjpeg: true })
-    .toFile(tmpPath);
-
-  if (inputPath !== finalPath) {
-    await fs.unlink(inputPath).catch(() => {});
-  } else {
-    await fs.unlink(inputPath).catch(() => {});
-  }
-  await fs.rename(tmpPath, finalPath);
-
-  return { path: finalPath, filename: finalFilename };
-}
 
 function userPhotoDir(userId) {
   return path.join(uploadsRoot, "users", String(userId));

@@ -4,10 +4,20 @@ import { api } from "../lib/api";
 
 function formatTime(value) {
   try {
-    return new Date(value).toLocaleString("lt-LT");
+    return new Date(value).toLocaleString("lt-LT", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
   } catch {
     return "";
   }
+}
+
+function initials(name) {
+  const parts = String(name || "?").trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase() || "").join("") || "?";
 }
 
 export function AdminChatPanel({ onError, onSuccess }) {
@@ -110,129 +120,110 @@ export function AdminChatPanel({ onError, onSuccess }) {
   }
 
   return (
-    <div className="card p-6 text-left">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+    <div className="overflow-hidden rounded-[1.5rem] bg-white shadow-card ring-1 ring-white">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-sand-100 bg-gradient-to-r from-skyyard-50 to-white px-4 py-4 sm:px-5">
         <div>
-          <h2 className="font-display text-xl font-semibold text-navy-800">Žinutės iš lankytojų</h2>
-          <p className="mt-1 text-sm text-navy-800/65">
-            Kai atsakote, lankytojas mato jūsų vardą. Naujos žinutės ateina į visų adminų Gmail.
-          </p>
+          <h2 className="font-display text-xl font-semibold text-navy-800">Lankytojų žinutės</h2>
+          <p className="mt-0.5 text-sm text-navy-800/55">Inbox · pirmas atsakymas priskiria jūsų vardą</p>
         </div>
-        <button className="btn-ghost" type="button" onClick={() => loadThreads().catch(() => {})}>
+        <button className="btn-ghost !px-3 !py-2 text-xs" type="button" onClick={() => loadThreads().catch(() => {})}>
           Atnaujinti
         </button>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-5">
-        <div className="max-h-[420px] space-y-2 overflow-y-auto lg:col-span-2">
+      <div className="grid lg:grid-cols-5">
+        <div className="max-h-[380px] space-y-1 overflow-y-auto border-b border-sand-100 p-3 lg:col-span-2 lg:max-h-[480px] lg:border-b-0 lg:border-r">
           {threads.length === 0 ? (
-            <div className="rounded-xl bg-sand-50 p-4 text-sm text-navy-800/65 ring-1 ring-sand-200">
+            <div className="rounded-2xl bg-sand-50 p-4 text-sm text-navy-800/60 ring-1 ring-sand-200">
               Nėra atvirų pokalbių.
             </div>
           ) : (
-            threads.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => openThread(t.id)}
-                className={[
-                  "w-full rounded-xl p-3 text-left ring-1 transition",
-                  String(selectedId) === String(t.id)
-                    ? "bg-navy-800 text-white ring-navy-800"
-                    : "bg-white text-navy-800 ring-sand-200 hover:bg-sand-50"
-                ].join(" ")}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-semibold">{t.guestName}</span>
-                  {t.unreadByAdmin ? (
-                    <span
-                      className={[
-                        "rounded px-1.5 py-0.5 text-[10px] font-bold uppercase",
-                        String(selectedId) === String(t.id) ? "bg-white/20" : "bg-tan-200 text-navy-900"
-                      ].join(" ")}
-                    >
-                      Nauja
+            threads.map((t) => {
+              const active = String(selectedId) === String(t.id);
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => openThread(t.id)}
+                  className={[
+                    "flex w-full items-start gap-3 rounded-2xl p-3 text-left transition",
+                    active ? "bg-skyyard-100 ring-1 ring-skyyard-200" : "hover:bg-sand-50"
+                  ].join(" ")}
+                >
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-navy-800 text-xs font-bold text-white">
+                    {initials(t.guestName)}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-semibold text-navy-900">{t.guestName}</span>
+                      {t.unreadByAdmin ? (
+                        <span className="grid h-5 min-w-5 place-items-center rounded-full bg-skyyard-500 px-1.5 text-[10px] font-bold text-white">
+                          1
+                        </span>
+                      ) : null}
                     </span>
-                  ) : null}
-                </div>
-                <div
-                  className={[
-                    "mt-0.5 text-xs",
-                    String(selectedId) === String(t.id) ? "text-white/80" : "text-navy-800/55"
-                  ].join(" ")}
-                >
-                  {t.guestEmail}
-                </div>
-                <div
-                  className={[
-                    "mt-1 text-[11px]",
-                    String(selectedId) === String(t.id) ? "text-white/70" : "text-navy-800/40"
-                  ].join(" ")}
-                >
-                  {t.assignedAdminDisplayName
-                    ? `Atsako: ${t.assignedAdminDisplayName}`
-                    : "Dar nepriskirta"}{" "}
-                  · {formatTime(t.lastMessageAt)}
-                </div>
-              </button>
-            ))
+                    <span className="mt-0.5 block truncate text-xs text-navy-800/50">{t.guestEmail}</span>
+                    <span className="mt-1 block text-[11px] text-navy-800/40">{formatTime(t.lastMessageAt)}</span>
+                  </span>
+                </button>
+              );
+            })
           )}
         </div>
 
-        <div className="flex min-h-[360px] flex-col rounded-2xl bg-white ring-1 ring-sand-200 lg:col-span-3">
+        <div className="flex min-h-[360px] flex-col lg:col-span-3 lg:min-h-[480px]">
           {!thread ? (
-            <div className="flex flex-1 items-center justify-center p-6 text-sm text-navy-800/50">
-              Pasirinkite pokalbį iš sąrašo arba atidarykite nuorodą iš el. laiško.
+            <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
+              <span className="grid h-14 w-14 place-items-center rounded-full bg-skyyard-50 text-skyyard-500 ring-1 ring-skyyard-100">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <path d="M5 6h14v10H8l-3 3V6Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+                </svg>
+              </span>
+              <p className="text-sm text-navy-800/55">Pasirinkite pokalbį iš sąrašo</p>
             </div>
           ) : (
             <>
-              <div className="flex flex-wrap items-start justify-between gap-2 border-b border-sand-200 px-4 py-3">
-                <div>
-                  <div className="text-sm font-bold text-navy-900">{thread.guestName}</div>
-                  <div className="text-xs text-navy-800/70">{thread.guestEmail}</div>
-                  {thread.guestPhone ? (
-                    <div className="text-xs text-navy-800/70">Tel.: {thread.guestPhone}</div>
-                  ) : null}
-                  <div className="mt-1 text-xs text-skyyard-500">
-                    {thread.assignedAdminDisplayName
-                      ? `Lankytojas mato: ${thread.assignedAdminDisplayName}`
-                      : "Dar niekas neatsakė — pirmas atsakymas priskirs jūsų vardą"}
+              <div className="flex flex-wrap items-start justify-between gap-2 border-b border-sand-100 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-11 w-11 place-items-center rounded-full bg-skyyard-100 text-sm font-bold text-navy-800">
+                    {initials(thread.guestName)}
+                  </span>
+                  <div>
+                    <div className="text-sm font-bold text-navy-900">{thread.guestName}</div>
+                    <div className="text-xs text-navy-800/60">{thread.guestEmail}</div>
+                    <div className="mt-0.5 text-[11px] text-skyyard-500">
+                      {thread.assignedAdminDisplayName
+                        ? `Lankytojas mato: ${thread.assignedAdminDisplayName}`
+                        : "Dar nepriskirta"}
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-2">
                   {!thread.assignedAdminDisplayName ? (
-                    <button className="btn-ghost" type="button" disabled={busy} onClick={claim}>
+                    <button className="btn-ghost !px-3 !py-1.5 text-xs" type="button" disabled={busy} onClick={claim}>
                       Prisiimti
                     </button>
                   ) : null}
-                  <button className="btn-ghost" type="button" disabled={busy} onClick={closeThread}>
+                  <button className="btn-ghost !px-3 !py-1.5 text-xs" type="button" disabled={busy} onClick={closeThread}>
                     Uždaryti
                   </button>
                 </div>
               </div>
 
-              <div className="flex-1 space-y-2 overflow-y-auto bg-sand-50 p-3">
+              <div className="flex-1 space-y-2 overflow-y-auto bg-sand-50/80 p-3">
                 {messages.map((m) => {
                   const admin = m.senderRole === "admin";
                   return (
                     <div key={m.id} className={`flex ${admin ? "justify-end" : "justify-start"}`}>
                       <div
                         className={[
-                          "max-w-[85%] rounded-2xl px-3 py-2 text-sm",
-                          admin
-                            ? "bg-navy-800 text-white"
-                            : "bg-white text-navy-800 ring-1 ring-sand-200"
+                          "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm shadow-sm",
+                          admin ? "bg-skyyard-100 text-navy-900" : "bg-white text-navy-800 ring-1 ring-sand-200"
                         ].join(" ")}
                       >
-                        <div
-                          className={`mb-0.5 text-[11px] font-semibold ${admin ? "text-skyyard-200" : "text-skyyard-500"}`}
-                        >
-                          {m.displayName}
-                        </div>
+                        <div className="mb-0.5 text-[11px] font-semibold text-navy-800/70">{m.displayName}</div>
                         <div className="whitespace-pre-wrap break-words">{m.body}</div>
-                        <div className={`mt-1 text-[10px] ${admin ? "text-white/70" : "text-navy-800/40"}`}>
-                          {formatTime(m.createdAt)}
-                        </div>
+                        <div className="mt-1 text-[10px] text-navy-800/40">{formatTime(m.createdAt)}</div>
                       </div>
                     </div>
                   );
@@ -240,16 +231,23 @@ export function AdminChatPanel({ onError, onSuccess }) {
                 <div ref={bottomRef} />
               </div>
 
-              <form className="grid gap-2 border-t border-sand-200 p-3" onSubmit={sendReply}>
+              <form className="flex items-end gap-2 border-t border-sand-100 bg-white p-3" onSubmit={sendReply}>
                 <textarea
-                  className="input min-h-[72px] resize-none"
-                  placeholder="Jūsų atsakymas lankytojui..."
+                  className="input min-h-[48px] flex-1 resize-none"
+                  placeholder="Parašykite atsakymą..."
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   required
                 />
-                <button className="btn-primary" type="submit" disabled={busy}>
-                  {busy ? "Siunčiama..." : "Atsakyti"}
+                <button
+                  className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-skyyard-500 text-white transition hover:brightness-105 disabled:opacity-50"
+                  type="submit"
+                  disabled={busy}
+                  aria-label="Siųsti"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <path d="M4 12 20 4l-6 16-2-7-8-1Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+                  </svg>
                 </button>
               </form>
             </>

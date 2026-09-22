@@ -6,6 +6,10 @@ import { useSeo } from "../lib/seo";
 
 const CONTACT_PHONE_DISPLAY = "+370 620 33487";
 const CONTACT_PHONE_TEL = "+37062033487";
+const CONTACT_ADDRESS = "Mažeikiai, Sodų 10";
+const MAPS_QUERY = encodeURIComponent("Sodų 10, Mažeikiai, Lietuva");
+const MAPS_EMBED_SRC = `https://maps.google.com/maps?q=${MAPS_QUERY}&hl=lt&z=16&output=embed`;
+const MAPS_OPEN_HREF = `https://www.google.com/maps/search/?api=1&query=${MAPS_QUERY}`;
 
 function LeafDecor({ className = "", flip = false }) {
   return (
@@ -110,9 +114,9 @@ const faqs = [
 export function Home() {
   const { isAuthed } = useAuth();
   useSeo({
-    title: "Gyvūnų viešbutis ir nakvynė augintiniams",
+    title: "Gyvūnų viešbutis Mažeikiuose | Sodų 10",
     description:
-      "Gyvūnų viešbutis Uodegų namai: patikima augintinių nakvynė ir priežiūra. Registruokite apsistojimą internetu.",
+      "Gyvūnų viešbutis Uodegų namai Mažeikiuose (Sodų 10): šunų nakvynė, priežiūra ir rezervacija internetu. Kai išvykstate — jiems kaip namie.",
     path: "/"
   });
 
@@ -246,11 +250,12 @@ export function Home() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-skyyard-500">Apie mus</p>
             <h2 className="mt-2 font-display text-[1.75rem] font-semibold leading-tight text-navy-800 sm:text-3xl md:text-4xl">
-              Sunny Yard — šilta vieta augintiniui
+              Gyvūnų viešbutis Mažeikiuose
             </h2>
             <p className="mt-4 text-base leading-relaxed text-navy-800/75 md:text-lg">
-              Uodegų namai — šeimos gyvūnų viešbutis, kur rūpinamės draugiškais šunimis kaip savais.
-              Aiški rezervacija, greitas atsakymas ir rami aplinka, kad jūs keliautumėte be nerimo.
+              Uodegų namai — šeimos gyvūnų viešbutis Mažeikiuose, Sodų 10. Rūpinamės draugiškais šunimis
+              kaip savais: aiški rezervacija internetu, greitas atsakymas ir rami aplinka, kad jūs
+              keliautumėte be nerimo.
             </p>
             <div className="mt-7 flex flex-wrap gap-2.5">
               {["Namų ramybė", "Daug žaidimų", "Aiški komunikacija"].map((t) => (
@@ -430,7 +435,7 @@ export function Home() {
           <div className="lg:col-span-4">
             <h2 className="section-title">Susisiekime!</h2>
             <p className="mt-3 text-sm text-navy-800/70">
-              Parašykite forma arba paskambinkite. Atsakome kuo greičiau.
+              Gyvūnų viešbutis Mažeikiuose — parašykite forma arba paskambinkite. Atsakome kuo greičiau.
             </p>
             <div className="mt-6 space-y-4 text-sm">
               <a
@@ -460,7 +465,12 @@ export function Home() {
                 </span>
                 Arba „Rašykite mums“ apačioje dešinėje
               </p>
-              <p className="flex items-center gap-3 text-navy-800/80">
+              <a
+                href={MAPS_OPEN_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 font-semibold text-navy-800 transition hover:text-skyyard-500"
+              >
                 <span className="grid h-10 w-10 place-items-center rounded-full bg-skyyard-100 text-navy-800">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <path
@@ -471,12 +481,27 @@ export function Home() {
                     <circle cx="12" cy="10" r="2.2" stroke="currentColor" strokeWidth="1.5" />
                   </svg>
                 </span>
-                Mažeikiai, Sodų 10
-              </p>
+                {CONTACT_ADDRESS}
+              </a>
             </div>
             <div className="mt-7 overflow-hidden rounded-[1.75rem] shadow-card ring-1 ring-sand-200">
-              <img src="/hero-sunny-yard.jpg" alt="Saulėtas kiemas" className="h-48 w-full object-cover" />
+              <iframe
+                title="Uodegų namai žemėlapyje — Mažeikiai, Sodų 10"
+                src={MAPS_EMBED_SRC}
+                className="h-52 w-full border-0 sm:h-56"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
             </div>
+            <a
+              href={MAPS_OPEN_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex text-sm font-semibold text-skyyard-500 hover:text-navy-800"
+            >
+              Atidaryti Google Maps →
+            </a>
           </div>
 
           <form
