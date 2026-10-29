@@ -39,10 +39,6 @@ export function Layout() {
   const firstName = user?.name ? String(user.name).split(" ")[0] : "";
 
   useEffect(() => {
-    setMenuOpen(false);
-  }, [location.pathname, location.hash]);
-
-  useEffect(() => {
     if (!menuOpen) return undefined;
     const onKey = (e) => {
       if (e.key === "Escape") setMenuOpen(false);

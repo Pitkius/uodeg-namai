@@ -5,14 +5,24 @@ import { api, toProtectedUploadPath } from "../lib/api";
  * Loads a protected upload via authenticated API and shows it as a blob URL.
  */
 export function AuthImage({ src, alt, className, version }) {
+  return (
+    <AuthenticatedImage
+      key={`${src || ""}:${version || ""}`}
+      src={src}
+      alt={alt}
+      className={className}
+      version={version}
+    />
+  );
+}
+
+function AuthenticatedImage({ src, alt, className, version }) {
   const [blobUrl, setBlobUrl] = useState("");
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let revoked = false;
     let objectUrl = "";
-    setFailed(false);
-    setBlobUrl("");
 
     const path = toProtectedUploadPath(src);
     if (!path) return undefined;

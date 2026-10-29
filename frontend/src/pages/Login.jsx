@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useSeo } from "../lib/seo";
@@ -19,19 +19,12 @@ export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [showResetForm, setShowResetForm] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
+  const [showResetForm, setShowResetForm] = useState(isResetOnlyView);
+  const [resetEmail, setResetEmail] = useState(() => searchParams.get("email") || "");
   const [resetCode, setResetCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [resetError, setResetError] = useState("");
   const [resetSuccess, setResetSuccess] = useState("");
-
-  useEffect(() => {
-    const shouldOpenReset = searchParams.get("reset") === "1";
-    if (!shouldOpenReset) return;
-    setShowResetForm(true);
-    setResetEmail(searchParams.get("email") || "");
-  }, [searchParams]);
 
   async function onSubmit(e) {
     e.preventDefault();

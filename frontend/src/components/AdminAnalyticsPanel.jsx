@@ -3,7 +3,7 @@ import { api } from "../lib/api";
 
 function formatDateKey(dateKey) {
   try {
-    const [y, m, d] = String(dateKey).split("-");
+    const [, m, d] = String(dateKey).split("-");
     return `${d}.${m}`;
   } catch {
     return dateKey;

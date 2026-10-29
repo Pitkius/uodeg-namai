@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useEffect, useState } from "react";
 import { api } from "../lib/api";
 import {
   getStoredToken,
@@ -125,23 +126,20 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
-  const value = useMemo(
-    () => ({
-      token,
-      user,
-      loading,
-      isAuthed: Boolean(token) || Boolean(user),
-      isAdmin: user?.role === "admin",
-      isSuperAdmin: Boolean(user?.isSuperAdmin),
-      login,
-      register,
-      requestResetCode,
-      confirmResetPassword,
-      logout,
-      refreshMe
-    }),
-    [token, user, loading]
-  );
+  const value = {
+    token,
+    user,
+    loading,
+    isAuthed: Boolean(token) || Boolean(user),
+    isAdmin: user?.role === "admin",
+    isSuperAdmin: Boolean(user?.isSuperAdmin),
+    login,
+    register,
+    requestResetCode,
+    confirmResetPassword,
+    logout,
+    refreshMe
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
